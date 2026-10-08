@@ -1,0 +1,376 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ITÄMERI THEME v1
+   Tailwind CSS v4, light mode only.
+   Paste this whole file as src/routes/layout.css (import it once from
+   src/routes/+layout.svelte). Do not edit values: ask the design owner.
+   Docs: README in the Itämeri design system. Fonts load from src/app.html.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@import "tailwindcss";
+
+@theme static {
+  /* ── 0. Wipe Tailwind defaults ─────────────────────────────────────────────
+     Only house tokens exist. If a class "does nothing" (text-gray-500, bg-blue-600,
+     rounded-lg, shadow-md, text-2xl, font-bold) you used a non-token: swap it. */
+  --color-*: initial;
+  --font-*: initial;
+  --font-weight-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  /* ── 1. Ramps (50 lightest → 950 darkest). Prefer the ROLES in section 2. ── */
+  /* sea: deep Baltic blue. The trust colour: actions, links, the top bar. */
+  --color-sea-50: #f2f7fe;
+  --color-sea-100: #e3eeff;
+  --color-sea-200: #c6dcff;
+  --color-sea-300: #9dc2fe;
+  --color-sea-400: #71a0ef;
+  --color-sea-500: #4a7dd8;
+  --color-sea-600: #285ec4;
+  --color-sea-700: #1b469d;
+  --color-sea-800: #13347b;
+  --color-sea-900: #0d255d;
+  --color-sea-950: #06163d;
+  /* tide: sea green. "You are here / you chose this": selected states, eyebrows, units, icons. */
+  --color-tide-50: #edfaf7;
+  --color-tide-100: #d3f6ec;
+  --color-tide-200: #b4e8da;
+  --color-tide-300: #8ed1bf;
+  --color-tide-400: #5fb29d;
+  --color-tide-500: #28947d;
+  --color-tide-600: #037661;
+  --color-tide-700: #025b4a;
+  --color-tide-800: #044537;
+  --color-tide-900: #013327;
+  --color-tide-950: #011f17;
+  /* brass: the twinkle. "Now / new / focus": the buoy dot, focus ring, current markers. Sparingly. */
+  --color-brass-50: #fef5e8;
+  --color-brass-100: #feeacd;
+  --color-brass-200: #f5d5ab;
+  --color-brass-300: #e2b985;
+  --color-brass-400: #c79557;
+  --color-brass-500: #ac7225;
+  --color-brass-600: #8d5604;
+  --color-brass-700: #6f4102;
+  --color-brass-800: #573000;
+  --color-brass-900: #402100;
+  --color-brass-950: #2a1300;
+  /* ink: cool neutral for text and strong borders. */
+  --color-ink-50: #f3f7fc;
+  --color-ink-100: #e6eef6;
+  --color-ink-200: #d3dce6;
+  --color-ink-300: #b7c2ce;
+  --color-ink-400: #95a1af;
+  --color-ink-500: #748290;
+  --color-ink-600: #586676;
+  --color-ink-700: #424e5c;
+  --color-ink-800: #313c47;
+  --color-ink-900: #222b34;
+  --color-ink-950: #131a21;
+  /* paper: warm chart-paper neutral for page, cards and wells. */
+  --color-paper-50: #fefbf5;
+  --color-paper-100: #f8f4ec;
+  --color-paper-200: #eee9df;
+  --color-paper-300: #ded9cd;
+  --color-paper-400: #c3bdb1;
+  --color-paper-500: #a49e91;
+  --color-paper-600: #867f72;
+  --color-paper-700: #686356;
+  --color-paper-800: #4c473d;
+  --color-paper-900: #343027;
+  --color-paper-950: #201c16;
+  --color-white: #ffffff;
+
+  /* ── 2. Roles. Reach for these first; every role names its grounds. ───────── */
+  /* Surfaces */
+  --color-page: var(--color-paper-100);
+  --color-surface: var(--color-paper-50);
+  --color-sunken: var(--color-paper-200);
+  --color-deep: var(--color-sea-900);
+  /* Text */
+  --color-fg: var(--color-ink-900);
+  --color-fg-muted: var(--color-ink-600);
+  --color-on-deep: var(--color-paper-50);
+  --color-on-deep-muted: var(--color-sea-200);
+  --color-on-data: var(--color-ink-950);
+  /* Lines */
+  --color-line: var(--color-paper-300);
+  --color-line-strong: var(--color-ink-500);
+  /* Action */
+  --color-action: var(--color-sea-700);
+  --color-action-hover: var(--color-sea-800);
+  --color-action-press: var(--color-sea-900);
+  --color-on-action: #ffffff;
+  --color-action-soft: var(--color-sea-50);
+  --color-link: var(--color-sea-700);
+  --color-link-hover: var(--color-sea-800);
+  /* Accent */
+  --color-accent: var(--color-tide-600);
+  --color-accent-strong: var(--color-tide-700);
+  --color-accent-soft: var(--color-tide-100);
+  --color-on-accent-soft: var(--color-tide-800);
+  /* Twinkle */
+  --color-highlight: var(--color-brass-400);
+  --color-highlight-soft: var(--color-brass-100);
+  --color-on-highlight-soft: var(--color-brass-800);
+  --color-focus: var(--color-brass-500);
+  /* Feedback */
+  --color-ok: #106c3e;
+  --color-ok-soft: #dff8e6;
+  --color-warn: #8d5406;
+  --color-warn-soft: #fff0d3;
+  --color-danger: #b02a2d;
+  --color-danger-soft: #ffebe9;
+  --color-info: var(--color-sea-700);
+  --color-info-soft: var(--color-sea-50);
+  /* Status scale */
+  --color-status-high: #5fa5de;
+  --color-status-good: #65d3a7;
+  --color-status-moderate: #f7df69;
+  --color-status-poor: #f8a052;
+  --color-status-bad: #e85f61;
+  /* Algae scale */
+  --color-algae-0: #c7f1ce;
+  --color-algae-1: #dbd856;
+  --color-algae-2: #e29936;
+  --color-algae-3: #b67b56;
+  /* Map */
+  --color-map-water: #d1e7f4;
+  --color-map-land: #f8f4ec;
+  --color-map-outline: #95a1af;
+  --color-map-muted: #b7c2ce;
+  --color-map-select: #0d255d;
+  --color-map-here: #ac7225;
+  --color-map-label: #424e5c;
+
+  /* ── 3. Type. Two faces, three weights, six sizes. ───────────────────────── */
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif; /* headings, big numbers, brand name */
+  --font-sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif; /* everything else (default) */
+  --font-weight-normal: 400;   /* body */
+  --font-weight-semibold: 600; /* labels, buttons, headings */
+  --font-weight-bold: 700;     /* font-display only: stat values */
+  --text-xs: 0.75rem; --text-xs--line-height: 1rem; /* captions, legend labels, tags, nav labels */
+  --text-sm: 0.875rem; --text-sm--line-height: 1.25rem; /* meta lines, chips, secondary text */
+  --text-base: 1rem; --text-base--line-height: 1.5rem; /* body, buttons, inputs, list titles */
+  --text-lg: 1.25rem; --text-lg--line-height: 1.75rem; --text-lg--letter-spacing: -0.005em; /* h2 / card titles (font-display) */
+  --text-xl: 1.625rem; --text-xl--line-height: 2rem; --text-xl--letter-spacing: -0.01em; /* h1 / page titles (font-display) */
+  --text-display: 2.75rem; --text-display--line-height: 3rem; --text-display--letter-spacing: -0.02em; /* stat values, About hero (font-display) */
+
+  /* ── 4. Shape and depth ─────────────────────────────────────────────────── */
+  --radius-control: 0.75rem; /* 12px: buttons, inputs, skeleton blocks */
+  --radius-card: 1.25rem;    /* 20px: cards, panels, sheets. Chips/tags/icon buttons use rounded-full */
+  --shadow-float: 0 1px 2px rgb(13 37 93 / 0.10), 0 8px 24px -6px rgb(13 37 93 / 0.22); /* ONLY things floating over the map */
+
+  /* ── 5. Spacing and layout (default 4px scale stays; these are named extras) ── */
+  --spacing-gutter: 1rem;   /* page side padding: px-gutter. Becomes 1.5rem at md (base layer) */
+  --spacing-tap: 2.75rem;   /* 44px touch target: size-tap, min-h-tap */
+  --spacing-bar: 3.5rem;    /* top bar height: h-bar; map top offset: top-bar */
+  --spacing-nav: 4rem;      /* bottom nav height without safe area: h-nav */
+  --spacing-safe: env(safe-area-inset-bottom, 0px); /* pb-safe on the bottom nav */
+  --spacing-dock: calc(4rem + env(safe-area-inset-bottom, 0px)); /* space the bottom nav takes: pb-dock on <main>, bottom-dock on the map */
+  --spacing-hud: calc(1rem + env(safe-area-inset-bottom, 0px)); /* bottom offset of map overlays: bottom-hud */
+  --container-content: 42rem; /* reading width: max-w-content */
+  --container-wide: 72rem;    /* top-bar and grid width: max-w-wide */
+  --container-panel: 24rem;   /* desktop map side panel: w-panel */
+}
+
+@layer base {
+  :root { color-scheme: light; }
+  @media (width >= 48rem) { :root { --spacing-gutter: 1.5rem; } }
+
+  html {
+    background-color: var(--color-page);
+    color: var(--color-fg);
+    font-variant-numeric: tabular-nums lining-nums;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body { min-height: 100dvh; font-size: var(--text-base); line-height: var(--text-base--line-height); }
+
+  /* Tailwind v4 borders default to currentColor; ours default to the hairline. */
+  *, ::before, ::after, ::backdrop { border-color: var(--color-line); }
+
+  h1, h2 { font-family: var(--font-display); font-weight: var(--font-weight-semibold); text-wrap: balance; color: inherit; }
+  h1 { font-size: var(--text-xl); line-height: var(--text-xl--line-height); letter-spacing: var(--text-xl--letter-spacing); }
+  h2 { font-size: var(--text-lg); line-height: var(--text-lg--line-height); letter-spacing: var(--text-lg--letter-spacing); }
+  h3 { font-size: var(--text-base); line-height: var(--text-base--line-height); font-weight: var(--font-weight-semibold); }
+  b, strong { font-weight: var(--font-weight-semibold); }
+  small { font-size: var(--text-sm); line-height: var(--text-sm--line-height); }
+
+  a { color: var(--color-link); text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+  @media (hover: hover) { a:hover { color: var(--color-link-hover); text-decoration-style: wavy; } } /* the twinkle */
+
+  :focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+  ::selection { background-color: var(--color-highlight-soft); color: var(--color-fg); }
+  ::placeholder { color: var(--color-fg-muted); opacity: 1; }
+}
+
+/* ── 6. Component utilities ──────────────────────────────────────────────────
+   One class = one finished component. Put LAYOUT classes beside them
+   (m-*, w-full, flex-1, grid placement). Never add colour, padding, radius,
+   font or shadow classes to them: that is how four agents get four looks. */
+
+@utility btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: var(--spacing-tap); padding-inline: 1.25rem;
+  border: 1px solid transparent; border-radius: var(--radius-control);
+  font-family: var(--font-sans); font-size: var(--text-base); line-height: 1.25rem; font-weight: var(--font-weight-semibold);
+  text-decoration-line: none; white-space: nowrap; cursor: pointer;
+  &:disabled, &[aria-disabled="true"] { background-color: var(--color-sunken); border-color: transparent; color: var(--color-fg-muted); cursor: not-allowed; }
+  background-color: var(--color-action); color: var(--color-on-action);
+  @media (hover: hover) { &:hover:not(:disabled) { background-color: var(--color-action-hover); color: var(--color-on-action); } }
+  &:active:not(:disabled) { background-color: var(--color-action-press); }
+}
+@utility btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: var(--spacing-tap); padding-inline: 1.25rem;
+  border: 1px solid transparent; border-radius: var(--radius-control);
+  font-family: var(--font-sans); font-size: var(--text-base); line-height: 1.25rem; font-weight: var(--font-weight-semibold);
+  text-decoration-line: none; white-space: nowrap; cursor: pointer;
+  &:disabled, &[aria-disabled="true"] { background-color: var(--color-sunken); border-color: transparent; color: var(--color-fg-muted); cursor: not-allowed; }
+  background-color: var(--color-surface); border-color: var(--color-line-strong); color: var(--color-action);
+  @media (hover: hover) { &:hover:not(:disabled) { background-color: var(--color-action-soft); color: var(--color-action-hover); } }
+}
+@utility btn-quiet {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: var(--spacing-tap); padding-inline: 1.25rem;
+  border: 1px solid transparent; border-radius: var(--radius-control);
+  font-family: var(--font-sans); font-size: var(--text-base); line-height: 1.25rem; font-weight: var(--font-weight-semibold);
+  text-decoration-line: none; white-space: nowrap; cursor: pointer;
+  &:disabled, &[aria-disabled="true"] { background-color: var(--color-sunken); border-color: transparent; color: var(--color-fg-muted); cursor: not-allowed; }
+  padding-inline: 0.75rem; background-color: transparent; color: var(--color-action);
+  @media (hover: hover) { &:hover:not(:disabled) { background-color: var(--color-action-soft); color: var(--color-action-hover); } }
+}
+@utility btn-on-deep {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-height: var(--spacing-tap); padding-inline: 1.25rem;
+  border: 1px solid transparent; border-radius: var(--radius-control);
+  font-family: var(--font-sans); font-size: var(--text-base); line-height: 1.25rem; font-weight: var(--font-weight-semibold);
+  text-decoration-line: none; white-space: nowrap; cursor: pointer;
+  &:disabled, &[aria-disabled="true"] { background-color: var(--color-sunken); border-color: transparent; color: var(--color-fg-muted); cursor: not-allowed; }
+  background-color: var(--color-on-deep); color: var(--color-deep);
+  @media (hover: hover) { &:hover:not(:disabled) { background-color: var(--color-sea-100); color: var(--color-deep); } }
+}
+
+@utility icon-btn {
+  display: inline-grid; place-items: center; flex: none;
+  width: var(--spacing-tap); height: var(--spacing-tap); border-radius: 9999px;
+  background-color: var(--color-surface); color: var(--color-fg); box-shadow: var(--shadow-float);
+  cursor: pointer;
+  & > svg { width: 1.5rem; height: 1.5rem; }
+  @media (hover: hover) { &:hover { background-color: var(--color-paper-100); } }
+  &[aria-pressed="true"] { background-color: var(--color-accent-soft); color: var(--color-on-accent-soft); }
+}
+@utility icon-btn-quiet {
+  display: inline-grid; place-items: center; flex: none;
+  width: var(--spacing-tap); height: var(--spacing-tap); border-radius: 9999px;
+  background-color: transparent; color: inherit; cursor: pointer;
+  & > svg { width: 1.5rem; height: 1.5rem; }
+  @media (hover: hover) { &:hover { background-color: color-mix(in oklab, currentColor 12%, transparent); } }
+}
+
+@utility card {
+  display: block; background-color: var(--color-surface); color: var(--color-fg);
+  border: 1px solid var(--color-line); border-radius: var(--radius-card); padding: 1.25rem;
+  &:is(a) { text-decoration-line: none; }
+  @media (hover: hover) { &:is(a):hover { border-color: var(--color-line-strong); color: var(--color-fg); } }
+}
+@utility card-flush {
+  display: block; background-color: var(--color-surface); color: var(--color-fg);
+  border: 1px solid var(--color-line); border-radius: var(--radius-card); overflow: hidden;
+  list-style: none; margin: 0; padding: 0;
+  & > * + * { border-top: 1px solid var(--color-line); }
+}
+@utility panel {
+  background-color: var(--color-surface); color: var(--color-fg);
+  border-radius: var(--radius-card); box-shadow: var(--shadow-float); padding: 1rem;
+}
+@utility sheet {
+  background-color: var(--color-surface); color: var(--color-fg); box-shadow: var(--shadow-float);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  padding: 1.25rem var(--spacing-gutter) 1.25rem;
+  &::before { content: ""; display: block; width: 2.25rem; height: 0.25rem; margin: -0.5rem auto 1rem; border-radius: 9999px; background-color: var(--color-ink-300); }
+  @media (width >= 48rem) { border-radius: var(--radius-card); &::before { display: none; } }
+}
+
+@utility chip {
+  position: relative; display: inline-flex; align-items: center; gap: 0.375rem;
+  min-height: 2.25rem; padding-inline: 0.875rem; border-radius: 9999px;
+  border: 1px solid var(--color-line-strong); background-color: var(--color-surface); color: var(--color-fg);
+  font-size: var(--text-sm); line-height: 1.25rem; font-weight: var(--font-weight-semibold);
+  text-decoration-line: none; cursor: pointer;
+  &::after { content: ""; position: absolute; inset: -0.25rem 0; } /* 44px tap height */
+  & > svg { width: 1.125rem; height: 1.125rem; }
+  @media (hover: hover) { &:hover { background-color: var(--color-paper-100); color: var(--color-fg); } }
+  &:is([aria-pressed="true"], [aria-selected="true"], [aria-current]:not([aria-current="false"])) {
+    background-color: var(--color-accent-soft); border-color: var(--color-accent); color: var(--color-on-accent-soft);
+  }
+}
+@utility tag {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  min-height: 1.5rem; padding-inline: 0.625rem; border-radius: 9999px;
+  color: var(--color-on-data); font-size: var(--text-xs); line-height: 1rem; font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+@utility swatch {
+  display: inline-block; flex: none; width: 0.875rem; height: 0.875rem; border-radius: 0.25rem;
+  box-shadow: inset 0 0 0 1px rgb(19 26 33 / 0.18);
+}
+@utility buoy {
+  display: inline-block; flex: none; width: 0.625rem; height: 0.625rem; border-radius: 9999px;
+  background-color: var(--color-highlight);
+  box-shadow: 0 0 0 0.25rem color-mix(in oklab, var(--color-highlight) 28%, transparent);
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans); font-size: var(--text-xs); line-height: 1rem; font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-accent-strong);
+  :where(.bg-deep) & { color: var(--color-highlight); } /* brass on deep bands */
+}
+@utility stat-value {
+  font-family: var(--font-display); font-size: var(--text-display); line-height: var(--text-display--line-height);
+  letter-spacing: var(--text-display--letter-spacing); font-weight: var(--font-weight-semibold); color: var(--color-deep);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+@utility stat-unit {
+  margin-inline-start: 0.25rem; font-family: var(--font-sans); font-size: var(--text-base); line-height: 1;
+  font-weight: var(--font-weight-semibold); color: var(--color-accent-strong);
+}
+
+@utility list-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  min-height: 3.5rem; padding: 0.75rem var(--spacing-gutter);
+  color: var(--color-fg); text-decoration-line: none;
+  @media (hover: hover) { &:is(a, button):hover { background-color: var(--color-paper-100); color: var(--color-fg); } }
+  &:is([aria-current]:not([aria-current="false"]), [aria-selected="true"]) { background-color: var(--color-accent-soft); color: var(--color-on-accent-soft); }
+}
+@utility nav-item {
+  display: flex; flex: 1 1 0; flex-direction: column; align-items: center; justify-content: center; gap: 0.125rem;
+  min-height: var(--spacing-nav); color: var(--color-fg-muted); text-decoration-line: none;
+  font-size: var(--text-xs); line-height: 1rem; font-weight: var(--font-weight-semibold);
+  & > :first-child { width: 3.5rem; height: 2rem; padding: 0.25rem 1rem; border-radius: 9999px; }
+  @media (hover: hover) { &:hover { color: var(--color-fg); } }
+  &[aria-current="page"] { color: var(--color-on-accent-soft); }
+  &[aria-current="page"] > :first-child { background-color: var(--color-accent-soft); }
+}
+@utility bar-link {
+  display: inline-flex; align-items: center; gap: 0.5rem; min-height: var(--spacing-tap); padding-inline: 0.75rem;
+  color: var(--color-on-deep-muted); text-decoration-line: none;
+  font-size: var(--text-sm); line-height: 1.25rem; font-weight: var(--font-weight-semibold);
+  @media (hover: hover) { &:hover { color: var(--color-on-deep); text-decoration-line: none; } }
+  &[aria-current="page"] { color: var(--color-on-deep); box-shadow: inset 0 -3px 0 var(--color-highlight); }
+}
+
+@utility field {
+  display: block; width: 100%; min-height: var(--spacing-tap); padding-inline: 0.75rem;
+  border: 1px solid var(--color-line-strong); border-radius: var(--radius-control);
+  background-color: var(--color-surface); color: var(--color-fg); font-size: var(--text-base);
+  &[aria-invalid="true"] { border-color: var(--color-danger); }
+}
+@utility notice {
+  display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border-radius: var(--radius-card); color: var(--color-fg);
+  & > svg:first-child { flex: none; width: 1.5rem; height: 1.5rem; }
+}
+@utility skeleton {
+  display: block; border-radius: var(--radius-control); background-color: var(--color-sunken); color: transparent;
+}
