@@ -19,7 +19,15 @@
 	});
 </script>
 
-<p class="eyebrow">Lähelläsi</p>
+<button
+	type="button"
+	class="absolute inset-x-0 top-0 h-8 md:hidden"
+	aria-label={open ? 'Piilota lista' : 'Näytä lista'}
+	aria-expanded={open}
+	aria-controls="nearby-list"
+	onclick={() => (open = !open)}
+></button>
+<p class="eyebrow">{map.here ? 'Sijainnistasi' : 'Kartan keskeltä'}</p>
 <h2 id="sheet-t" class="mt-1">
 	<button
 		type="button"

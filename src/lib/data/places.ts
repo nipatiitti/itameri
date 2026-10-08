@@ -1,12 +1,11 @@
 import { CATEGORIES, type Place, type PlaceCollection } from '$lib/types';
 
-// STUB: data-worker replaces this file. Contract: loadPlaces() resolves to Place[] from static/data/<category>.geojson,
-// a missing or broken file drops only that category, never throws.
+/** All places from static/data/<category>.geojson. A missing or broken file drops only that category; never throws. */
 export async function loadPlaces(): Promise<Place[]> {
 	const results = await Promise.all(
 		CATEGORIES.map(async (cat) => {
 			try {
-				const res = await fetch(`/data/${cat}.geojson`);
+				const res = await fetch(`/data/${cat}.geojson`, { signal: AbortSignal.timeout(8000) });
 				if (!res.ok) return [];
 				const fc = (await res.json()) as PlaceCollection;
 				return fc.features.map((f): Place => {

@@ -135,7 +135,7 @@
 
 			<section
 				bind:this={sheet}
-				class="sheet pointer-events-auto max-h-[60dvh] overflow-y-auto md:absolute md:top-4 md:right-gutter md:bottom-auto md:z-30 md:max-h-[calc(100dvh-8rem)] md:w-panel"
+				class="sheet relative pointer-events-auto max-h-[60dvh] overflow-y-auto md:absolute md:top-4 md:right-gutter md:bottom-auto md:z-30 md:max-h-[calc(100dvh-8rem)] md:w-panel"
 				aria-labelledby="sheet-t"
 			>
 				{#if app.selected}
