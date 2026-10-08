@@ -178,7 +178,7 @@
 					aria-pressed={app.rareOnly}
 					onclick={() => app.toggleRare()}
 				>
-					<Icon icon="ph:sliders-horizontal" aria-hidden="true" />
+					<Icon icon="ph:star" aria-hidden="true" />
 				</button>
 			</div>
 		</div>
