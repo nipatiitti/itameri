@@ -33,6 +33,40 @@
 	const MODE_LABEL = { full: 'Pienennä', header: 'Piilota', pill: 'Näytä' } as const;
 	let searchButton = $state<HTMLButtonElement>();
 
+	// Pill drag: follow the finger, snap on release. A short move is a tap and cycles the modes.
+	const ORDER = ['pill', 'header', 'full'] as const;
+	let dragStartY: number | null = null;
+	let dragDy = 0;
+	let dragged = false;
+
+	function dragStart(e: PointerEvent) {
+		dragStartY = e.clientY;
+		dragDy = 0;
+		dragged = false;
+		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+	}
+	function dragMove(e: PointerEvent) {
+		if (dragStartY === null || !sheet) return;
+		dragDy = e.clientY - dragStartY;
+		if (Math.abs(dragDy) > 8) dragged = true;
+		sheet.style.transform = `translateY(${Math.max(-40, dragDy)}px)`;
+	}
+	function dragEnd() {
+		if (dragStartY === null) return;
+		dragStartY = null;
+		if (sheet) sheet.style.transform = '';
+		if (!dragged) return;
+		const i = ORDER.indexOf(sheetMode);
+		if (dragDy < -120) sheetMode = 'full';
+		else if (dragDy > 120) sheetMode = 'pill';
+		else if (dragDy < -30) sheetMode = ORDER[Math.min(i + 1, 2)];
+		else if (dragDy > 30) sheetMode = ORDER[Math.max(i - 1, 0)];
+	}
+	function pillClick() {
+		if (dragged) return;
+		sheetMode = NEXT_MODE[sheetMode];
+	}
+
 	function closeSearch() {
 		searching = false;
 		tick().then(() => searchButton?.focus());
@@ -170,11 +204,16 @@
 					{#if !wide}
 						<button
 							type="button"
-							class="absolute inset-x-0 top-0 h-8 md:hidden"
+							class="absolute inset-x-0 top-0 h-8 cursor-grab md:hidden"
+							style="touch-action: none"
 							aria-label={MODE_LABEL[sheetMode]}
 							aria-expanded={sheetMode === 'full'}
 							aria-controls="sheet-body"
-							onclick={() => (sheetMode = NEXT_MODE[sheetMode])}
+							onpointerdown={dragStart}
+							onpointermove={dragMove}
+							onpointerup={dragEnd}
+							onpointercancel={dragEnd}
+							onclick={pillClick}
 						></button>
 					{/if}
 					<div id="sheet-body" hidden={!wide && sheetMode === 'pill'}>
