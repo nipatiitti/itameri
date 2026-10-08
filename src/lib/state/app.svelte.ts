@@ -8,6 +8,7 @@ export class AppState {
 	places = $state.raw<Place[]>([]);
 	status = $state<LoadStatus>('idle');
 	active = $state<Category[]>([...CATEGORIES]);
+	rareOnly = $state(false);
 	selectedId = $state<string | null>(null);
 	story = $state<Story | null>(null);
 	storyStatus = $state<LoadStatus>('idle');
@@ -16,7 +17,8 @@ export class AppState {
 	selected = $derived(this.selectedId ? (this.#byId.get(this.selectedId) ?? null) : null);
 	visible = $derived.by(() => {
 		const set = new Set(this.active);
-		return this.places.filter((p) => set.has(p.category));
+		const rare = this.rareOnly;
+		return this.places.filter((p) => set.has(p.category) && (!rare || p.rare));
 	});
 
 	byId(id: string): Place | undefined {
@@ -31,6 +33,9 @@ export class AppState {
 	}
 	setOnly(c: Category) {
 		this.active = [c];
+	}
+	toggleRare() {
+		this.rareOnly = !this.rareOnly;
 	}
 	showAll() {
 		this.active = [...CATEGORIES];

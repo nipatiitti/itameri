@@ -71,8 +71,8 @@
 		<div class="py-4 text-center">
 			<Icon icon="ph:anchor-simple" class="mx-auto size-10 text-accent" aria-hidden="true" />
 			<h3 class="mt-3">Täällä on tyyntä</h3>
-			<p class="mt-1 text-sm text-fg-muted">Yhtään lajia ei ole valittu, joten kartta lepää.</p>
-			<button type="button" class="btn-secondary mt-4" onclick={() => app.showAll()}>Näytä kaikki lajit</button>
+			<p class="mt-1 text-sm text-fg-muted">Tältä alueelta ei löytynyt aarteita valituilla rajauksilla.</p>
+			<button type="button" class="btn-secondary mt-4" onclick={() => { app.rareOnly = false; app.showAll(); }}>Näytä kaikki</button>
 		</div>
 	{/if}
 </div>

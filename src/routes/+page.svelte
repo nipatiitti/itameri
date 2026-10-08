@@ -8,6 +8,8 @@
 	import NearbyList from '$lib/components/NearbyList.svelte';
 	import PlaceSheet from '$lib/components/PlaceSheet.svelte';
 	import PlaceSearch from '$lib/components/PlaceSearch.svelte';
+	import { scale } from 'svelte/transition';
+	import { tick } from 'svelte';
 	import { COPY } from '$lib/content/copy';
 	import { app } from '$lib/state/app.svelte';
 	import { map } from '$lib/state/map.svelte';
@@ -26,7 +28,7 @@
 
 	function closeSearch() {
 		searching = false;
-		searchButton?.focus();
+		tick().then(() => searchButton?.focus());
 	}
 
 	function show(place: Place) {
@@ -142,36 +144,43 @@
 		<PlacesMap />
 
 		<div class="pointer-events-none absolute inset-x-0 top-16 z-10 flex flex-col items-end gap-2 px-gutter md:top-4">
-			<div class="pointer-events-auto flex flex-col gap-2">
+			<div class="flex w-full flex-col items-end gap-2 md:w-panel">
+				{#if searching}
+					<div class="pointer-events-auto w-full" in:scale={{ start: 0.6, duration: 160, opacity: 0 }}>
+						<PlaceSearch onclose={closeSearch} />
+					</div>
+				{:else}
+					<button
+						bind:this={searchButton}
+						type="button"
+						class="icon-btn pointer-events-auto"
+						aria-label="Hae paikkaa"
+						aria-expanded={searching}
+						aria-controls="place-search"
+						onclick={() => (searching = true)}
+					>
+						<Icon icon="ph:magnifying-glass" aria-hidden="true" />
+					</button>
+				{/if}
 				<button
-					bind:this={searchButton}
 					type="button"
-					class="icon-btn"
-					aria-label="Hae paikkaa"
-					aria-expanded={searching}
-					aria-controls="place-search"
-					onclick={() => (searching ? closeSearch() : (searching = true))}
-				>
-					<Icon icon="ph:magnifying-glass" aria-hidden="true" />
-				</button>
-				<button
-					type="button"
-					class="icon-btn"
+					class="icon-btn pointer-events-auto"
 					aria-label="Paikanna minut"
 					aria-busy={map.locating}
 					onclick={() => map.locate()}
 				>
 					<Icon icon="ph:crosshair" aria-hidden="true" />
 				</button>
-				<button type="button" class="icon-btn" aria-label="Näytä kaikki" onclick={() => app.showAll()}>
+				<button
+					type="button"
+					class="icon-btn pointer-events-auto"
+					aria-label="Vain harvinaiset"
+					aria-pressed={app.rareOnly}
+					onclick={() => app.toggleRare()}
+				>
 					<Icon icon="ph:sliders-horizontal" aria-hidden="true" />
 				</button>
 			</div>
-			{#if searching}
-				<div class="pointer-events-auto w-full md:w-panel md:max-w-full">
-					<PlaceSearch onclose={closeSearch} />
-				</div>
-			{/if}
 		</div>
 
 		{#if app.status === 'loading' || app.status === 'idle'}
