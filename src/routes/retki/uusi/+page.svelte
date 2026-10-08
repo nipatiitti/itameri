@@ -71,6 +71,7 @@
 					<button
 						type="button"
 						class="card w-full text-left"
+						aria-pressed={mood === m}
 						onclick={() => {
 							mood = m;
 							step = 2;
@@ -89,6 +90,7 @@
 					<button
 						type="button"
 						class="card w-full text-left"
+						aria-pressed={transport === t}
 						onclick={() => {
 							transport = t;
 							step = 3;
@@ -104,6 +106,7 @@
 					<button
 						type="button"
 						class="card w-full text-left"
+						aria-pressed={duration === d}
 						onclick={() => {
 							duration = d;
 							step = 4;

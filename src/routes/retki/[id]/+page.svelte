@@ -95,7 +95,7 @@
 			<ol class="card-flush mt-6" aria-label="Kohteet">
 				{#each stops as place, i (place.id)}
 					<li>
-						<a href={`/?p=${encodeURIComponent(place.id)}`} class="list-row">
+						<a href={`/?p=${encodeURIComponent(place.id)}`} class="list-row" onclick={() => (trips.activeId = trip?.id ?? null)}>
 							<span class="tag bg-sunken" aria-hidden="true">{i + 1}</span>
 							<span class="min-w-0 flex-1">
 								<span class="block truncate font-semibold">{place.name}</span>

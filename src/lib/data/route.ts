@@ -1,6 +1,6 @@
 import type { LngLat, Place, TripPlan } from '$lib/types';
 import { distanceM } from './geo';
-import { BUDGET, MOOD_META, STOP_MINUTES, TRANSPORT_META } from '$lib/content/trip';
+import { BUDGET, DURATION_META, MOOD_META, STOP_MINUTES, TRANSPORT_META } from '$lib/content/trip';
 
 export interface PlannedRoute {
 	stops: Place[]; // in visiting order, start not included
@@ -45,10 +45,26 @@ export function planTrip(plan: TripPlan, places: Place[]): PlannedRoute {
 		}
 	}
 
-	const stops = orderLoop(start, chosen);
-	const lengthM = loopLength(start, stops);
-	const minutes = Math.round((lengthM / 1000 / TRANSPORT_META[plan.transport].kmh) * 60 + stops.length * STOP_MINUTES);
-	return { stops, lengthM, minutes };
+	let stops = orderLoop(start, chosen);
+	const kmh = TRANSPORT_META[plan.transport].kmh;
+	const minutesOf = (s: Place[]) => Math.round((loopLength(start, s) / 1000 / kmh) * 60 + s.length * STOP_MINUTES);
+	const target = DURATION_META[plan.duration].minutes * 1.15;
+	// Over budget: drop the stop with the longest detour until the loop fits, keep at least two.
+	while (stops.length > 2 && minutesOf(stops) > target) {
+		let worst = 0;
+		let worstDetour = -Infinity;
+		stops.forEach((s, i) => {
+			const a = i === 0 ? start : stops[i - 1];
+			const b = i === stops.length - 1 ? start : stops[i + 1];
+			const detour = distanceM(a, s) + distanceM(s, b) - distanceM(a, b);
+			if (detour > worstDetour) {
+				worstDetour = detour;
+				worst = i;
+			}
+		});
+		stops = orderLoop(start, stops.filter((_, i) => i !== worst));
+	}
+	return { stops, lengthM: loopLength(start, stops), minutes: minutesOf(stops) };
 }
 
 /** Nearest-neighbour order from start, then 2-opt until no improvement. */

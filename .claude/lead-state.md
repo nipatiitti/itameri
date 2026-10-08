@@ -39,3 +39,11 @@ src/lib/content/trip.ts (MOOD_META with categories, TRANSPORT_META, DURATION_MET
 formatMinutes), src/lib/state/trips.svelte.ts (trips.list/active/activeId/create/reroll/rename/remove/stopsOf). map-worker: PickerMap.svelte
 (bind:center, follows map.fly) and route line + numbered stops in PlacesMap from trips.active. ui-worker: the three pages + trip tag on map panel.
 data-worker: Museovirasto wrecks into maritime. Nav icon ph:path (outside the design list, user-approved concept).
+
+## 18:35 status (all committed, workers idle)
+- Done since 18:15: wrecks (702) in maritime; Retki tab complete (list, wizard, detail, TripSheet on map, route layer, PickerMap);
+  phone sheet 3 modes (full/header/pill) at page level in +page.svelte; "Yllätä minut" hidden while a place or trip is selected;
+  rare filter = star button; search expands in place; README + About cover Retki/wrecks/Nominatim.
+- Route fit: planTrip trims stops (largest detour first, min 2) until minutes <= duration × 1.15.
+- Known risks: phone pill overlaps top of close button slightly; Lapland (lat > 66) not in extract; Nominatim rate limit not enforced.
+- Remaining: user browser pass of Retki + sheet → fixes → 19:20 freeze → pnpm build once (~19:30) → zip without node_modules/.svelte-kit (19:45).
