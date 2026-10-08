@@ -376,6 +376,7 @@ function list(s?: string): string[] {
 
 /** "Paikalla on rautakautinen kuppikivi. Se on muinaismuistolailla suojeltu." from Museovirasto fields. */
 function mvSentence(t: Record<string, string>): string | undefined {
+	if (/hyly/i.test(t.tyyppi ?? '')) return wreckSentence(t);
 	let kinds = list(t.alatyyppi)
 		.map((x) => SINGULAR[x])
 		.filter(Boolean);
@@ -391,6 +392,21 @@ function mvSentence(t: Record<string, string>): string | undefined {
 	}
 	parts.push('Se on kiinteä muinaisjäännös, jonka muinaismuistolaki suojelee.');
 	return parts.join(' ');
+}
+
+/** "Vedenalainen puuhylky, historiallinen aika." or "Metallihylky, ajoitus keskiaikainen." */
+function wreckSentence(t: Record<string, string>): string {
+	const sub = t.alatyyppi ?? '';
+	const kind = /metalli/i.test(sub) ? 'metallihylky' : /puu/i.test(sub) ? 'puuhylky' : 'hylky';
+	const head = t.vedenalainen === 'k' ? `Vedenalainen ${kind}` : capitalise(kind);
+	const dates = list(t.ajoitus).filter((x) => x.endsWith('nen'));
+	const when =
+		dates.length === 0
+			? ''
+			: dates.length === 1 && dates[0] === 'historiallinen'
+				? ', historiallinen aika'
+				: `, ajoitus ${joinFi(dates)}`;
+	return `${head}${when}. Se on kiinteä muinaisjäännös, jonka muinaismuistolaki suojelee.`;
 }
 
 function translative(adj: string): string {

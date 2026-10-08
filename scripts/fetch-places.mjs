@@ -3,6 +3,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { fetchWrecks, mergeWrecks } from './fetch-wrecks.mjs';
 
 const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'static', 'data');
 const UA = 'arjen-aarteet/0.1 (softamestari)';
@@ -457,6 +458,18 @@ async function runCategory(cat) {
 			const els = await overpassSplit(RULES[cat].query);
 			items = els.map((el) => osmFeature(el, cat)).filter(Boolean);
 		}
+		if (cat === 'maritime') {
+			try {
+				const wrecks = await fetchWrecks();
+				const kept = new Set(mergeWrecks(items.map((x) => x.f), wrecks));
+				items = [
+					...items.filter((x) => kept.has(x.f)),
+					...wrecks.map((f) => ({ f, key: 'mv:hylky', named: true, wreck: true }))
+				];
+			} catch (e) {
+				process.stdout.write(`  museovirasto wrecks failed: ${e.message}\n`);
+			}
+		}
 	} catch (e) {
 		process.stdout.write(`  ${cat} FAILED: ${e.message}, writing empty collection\n`);
 	}
@@ -476,7 +489,7 @@ async function runCategory(cat) {
 	for (const x of items) assigned.add(x.f.properties.id);
 	results.set(cat, items);
 	markRare(items.filter((x) => x.f.properties.src === 'osm'));
-	markRare(items.filter((x) => x.f.properties.src === 'museovirasto'));
+	markRare(items.filter((x) => x.f.properties.src === 'museovirasto' && !x.wreck));
 	const bytes = await writeCat(cat);
 	process.stdout.write(`${cat}: ${results.get(cat).length} features, ${(bytes / 1024).toFixed(0)} KB (${((Date.now() - t0) / 1000).toFixed(0)} s)\n`);
 }
@@ -498,7 +511,7 @@ async function main() {
 	// Global rarity over the whole extract, then rewrite every file.
 	const all = ORDER.flatMap((c) => results.get(c) ?? []);
 	markRare(all.filter((x) => x.f.properties.src === 'osm'));
-	markRare(all.filter((x) => x.f.properties.src === 'museovirasto'));
+	markRare(all.filter((x) => x.f.properties.src === 'museovirasto' && !x.wreck));
 	console.log('\nFinal (global rarity):');
 	for (const cat of ORDER) {
 		const bytes = await writeCat(cat);
