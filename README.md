@@ -108,6 +108,13 @@ it, or show it on the main map, where it is drawn as a dashed loop with numbered
 **The route is a sketch, not turn-by-turn directions.** Without the routing server the line
 crosses water, buildings and private land. It is not for navigation.
 
+### Museovirasto descriptions
+
+`scripts/fetch-kyppi.mjs` reads the "Kuvaus" paragraph of every Museovirasto place from its
+kyppi.fi record page once and stores it as `kuvaus` in the GeoJSON (cut at about 700 characters).
+The app shows it as the place's text when no Wikipedia article matches. Run it again with
+`node scripts/fetch-kyppi.mjs` to refresh; it is time-capped and keeps what it got.
+
 ## Data sources and licences
 
 | Source | Used for | Licence |

@@ -318,7 +318,7 @@ function baseStory(place: Place): Story {
 	const mv = place.source === 'museovirasto';
 	return {
 		title: place.name,
-		extract: t['description:fi'] ?? t.description ?? t.inscription ?? (mv ? mvSentence(t) : undefined),
+		extract: t.kuvaus ?? t['description:fi'] ?? t.description ?? t.inscription ?? (mv ? mvSentence(t) : undefined),
 		hero: place.image
 			? { url: place.image, credit: place.image.includes('wikimedia.org') ? 'Kuva: Wikimedia Commons' : 'Kuva: OpenStreetMap-yhteisö' }
 			: undefined,

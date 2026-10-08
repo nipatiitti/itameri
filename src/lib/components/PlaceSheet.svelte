@@ -47,7 +47,7 @@
   const found = $derived(finds.has(place.id));
   const loading = $derived(app.storyStatus === "loading");
   const extract = $derived(
-    app.story?.extract ?? place.tags.description ?? meta.blurb,
+    app.story?.extract ?? place.tags.kuvaus ?? place.tags.description ?? meta.blurb,
   );
   const readMore = $derived(app.story?.readMoreUrl ?? place.externalUrl);
   const sources = $derived(

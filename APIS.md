@@ -447,3 +447,4 @@ for `srsName=EPSG:4326` or `crs=…/CRS84`, or reproject with proj4
 
 ### Routing (added 18:58)
 | Valhalla public (FOSSGIS) | `POST https://valhalla1.openstreetmap.de/route` body `{locations:[{lat,lon,type:'break'}],costing:'pedestrian'|'bicycle'|'auto',units:'kilometers'}` → `trip.legs[].shape` (polyline6), `trip.summary.length` km, `trip.summary.time` s | JSON | CORS `*`, no key, fair use | ODbL data | ✅ probed 08.10.2026 | Used for Retki loops; straight line fallback. |
+| kyppi.fi record page (Museovirasto) | `GET https://www.kyppi.fi/palveluikkuna/mjreki/read/asp/r_kohde_det.aspx?KOHDE_ID=<mjtunnus>` → HTML, Kuvaus in `<span id="kuvaus">` | HTML | no CORS; fetched once by scripts/fetch-kyppi.mjs | CC BY 4.0 | ✅ 19:25 | 8 693 pages in ~6 min at concurrency 8 |
