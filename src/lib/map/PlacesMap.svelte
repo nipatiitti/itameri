@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { Map as MlMap, AttributionControl, type GeoJSONSource } from 'maplibre-gl';
+	import { Map as MlMap, AttributionControl, setWorkerUrl, type GeoJSONSource } from 'maplibre-gl';
+	import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { app } from '$lib/state/app.svelte';
 	import { map } from '$lib/state/map.svelte';
@@ -10,6 +11,7 @@
 	type Point = GeoJSON.Feature<GeoJSON.Point>;
 	type Collection = GeoJSON.FeatureCollection<GeoJSON.Point>;
 
+	setWorkerUrl(workerUrl);
 	const STYLE = 'https://tiles.openfreemap.org/styles/positron';
 	const EMPTY: Collection = { type: 'FeatureCollection', features: [] };
 
@@ -215,4 +217,4 @@
 	});
 </script>
 
-<div class="absolute inset-0" {@attach attachMap}></div>
+<div class="h-full w-full" {@attach attachMap}></div>

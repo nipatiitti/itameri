@@ -31,3 +31,4 @@ Nav: Kartta (/), Löydöt (/loydot), Tietoa (/tietoa). UI language Finnish. Serv
 ## Timeline
 17:03 start · 17:25 contracts + dispatch · ~18:00 skeleton on screen · 19:20 feature freeze · 19:30 build · 19:45 zip
 - IDEA.md adopted: name Arjen aarteet, rarity flag, nearby list in the sheet, Finna old-photo strip. Retki mode only if time.
+- Gotcha: maplibre-gl.css is unlayered and forces position:relative on the map div; size it with h-full w-full, not absolute inset-0. maplibre 6.13 needs setWorkerUrl with a Vite ?worker&url import (done in PlacesMap).
