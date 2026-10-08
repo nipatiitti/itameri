@@ -1,17 +1,21 @@
+<script lang="ts" module>
+	export interface SearchHit {
+		place_id: number;
+		display_name: string;
+		lat: string;
+		lon: string;
+	}
+</script>
+
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import type { LoadStatus } from '$lib/types';
 	import { map } from '$lib/state/map.svelte';
 	import { COPY } from '$lib/content/copy';
 
-	interface Hit {
-		place_id: number;
-		display_name: string;
-		lat: string;
-		lon: string;
-	}
+	type Hit = SearchHit;
 
-	let { onclose }: { onclose: () => void } = $props();
+	let { onclose, onpick }: { onclose: () => void; onpick?: (hit: SearchHit) => void } = $props();
 
 	let query = $state('');
 	let status = $state<LoadStatus>('idle');
@@ -52,6 +56,7 @@
 		query = '';
 		hits = [];
 		status = 'idle';
+		onpick?.(hit);
 		onclose();
 	}
 

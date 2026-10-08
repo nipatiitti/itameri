@@ -13,6 +13,7 @@
 	import { COPY } from '$lib/content/copy';
 	import { app } from '$lib/state/app.svelte';
 	import { map } from '$lib/state/map.svelte';
+	import { trips } from '$lib/state/trips.svelte';
 	import type { Place } from '$lib/types';
 
 	let recent: string[] = [];
@@ -108,10 +109,26 @@
 		{#if app.status === 'ready'}
 			<div
 				class={[
-					'pointer-events-none absolute inset-x-0 bottom-0 z-30 flex flex-col md:pointer-events-auto md:static md:gap-5',
+					'pointer-events-none absolute inset-x-0 bottom-0 z-30 flex flex-col md:pointer-events-auto md:contents',
 					searching && 'max-md:hidden'
 				]}
 			>
+				{#if trips.active}
+					<div class="notice pointer-events-auto mx-gutter mb-2 items-center bg-info-soft md:order-first md:mx-0 md:mb-0">
+						<p class="min-w-0 flex-1">
+							<a href={`/retki/${trips.active.id}`} class="block font-semibold">{trips.active.name}</a>
+							<span class="block text-sm">{trips.active.stops.length} kohdetta</span>
+						</p>
+						<button
+							type="button"
+							class="icon-btn-quiet -my-2 -mr-2"
+							aria-label="Piilota reitti"
+							onclick={() => (trips.activeId = null)}
+						>
+							<Icon icon="ph:x" class="size-6" aria-hidden="true" />
+						</button>
+					</div>
+				{/if}
 				<div class="flex flex-col items-center gap-2 px-gutter pb-4 md:items-stretch md:px-0 md:pb-0">
 					{#if empty}
 						<p role="status" class="notice pointer-events-auto bg-info-soft">
