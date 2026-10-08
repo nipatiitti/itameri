@@ -10,12 +10,16 @@ export interface FlyRequest {
 export class MapState {
 	/** Current map centre, updated by the map on moveend. Finland default. */
 	center = $state<LngLat>({ lon: 24.94, lat: 60.17 });
-	zoom = $state(12);
+	zoom = $state(13);
+	/** Visible extent [west, south, east, north], updated by the map on moveend. */
+	bounds = $state<[number, number, number, number] | null>(null);
 	/** User position from geolocation, null if unknown or denied. */
 	here = $state<LngLat | null>(null);
 	locating = $state(false);
 	/** Latest fly request; the map component reacts to `seq` changes. */
 	fly = $state<FlyRequest | null>(null);
+	/** Last fly `seq` the map has executed, so a remounted map does not replay an old request. */
+	handledSeq = 0;
 
 	flyTo(target: LngLat, zoom?: number) {
 		this.fly = { target, zoom, seq: (this.fly?.seq ?? 0) + 1 };
