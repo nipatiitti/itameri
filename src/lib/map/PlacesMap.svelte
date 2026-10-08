@@ -5,7 +5,7 @@
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { app } from '$lib/state/app.svelte';
 	import { map } from '$lib/state/map.svelte';
-	import { MAP } from '$lib/map-colors';
+	import { MAP, ALGAE } from '$lib/map-colors';
 	import type { LngLat } from '$lib/types';
 
 	type Point = GeoJSON.Feature<GeoJSON.Point>;
@@ -28,9 +28,31 @@
 		(m?.getSource(id) as GeoJSONSource | undefined)?.setData(data);
 	}
 
+	/** Pull positron's grey basemap toward the paper palette. Every colour is a theme token. */
+	function tintBasemap(mm: MlMap) {
+		const paint = (id: string, prop: string, value: unknown) => {
+			if (mm.getLayer(id)) mm.setPaintProperty(id, prop, value);
+		};
+		paint('background', 'background-color', MAP.land);
+		paint('water', 'fill-color', MAP.water);
+		paint('waterway', 'line-color', MAP.water);
+		for (const id of ['park', 'landcover_wood']) {
+			paint(id, 'fill-color', ALGAE[0]);
+			paint(id, 'fill-opacity', id === 'park' ? 0.45 : 0.3);
+		}
+		paint('landuse_residential', 'fill-color', MAP.muted);
+		paint('landuse_residential', 'fill-opacity', 0.12);
+		paint('building', 'fill-color', MAP.muted);
+		paint('building', 'fill-opacity', 0.3);
+		for (const id of ['highway-name-minor', 'highway-name-major', 'highway-name-path', 'label_other', 'label_village', 'label_town', 'label_city', 'label_state']) {
+			paint(id, 'text-color', MAP.label);
+			paint(id, 'text-halo-color', MAP.land);
+		}
+		for (const id of ['water_name_point_label', 'water_name_line_label']) paint(id, 'text-color', MAP.select);
+	}
+
 	function addLayers(mm: MlMap) {
-		if (mm.getLayer('background')) mm.setPaintProperty('background', 'background-color', MAP.land);
-		if (mm.getLayer('water')) mm.setPaintProperty('water', 'fill-color', MAP.water);
+		tintBasemap(mm);
 		if (mm.getSource('places')) return;
 
 		mm.addSource('places', {
