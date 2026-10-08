@@ -3,6 +3,7 @@
   import { app } from "$lib/state/app.svelte";
   import { finds } from "$lib/state/finds.svelte";
   import type { Place, StorySource } from "$lib/types";
+  import { COPY } from "$lib/content/copy";
   import Icon from "@iconify/svelte";
   import PhotoFigure from "./PhotoFigure.svelte";
 
@@ -106,8 +107,8 @@
 <div id="place-body" hidden={!expanded}>
 {#if place.rare || found}
   <ul class="mt-3 flex flex-wrap gap-2" aria-label="Merkinnät">
-    {#if place.rare}<li class="tag bg-highlight-soft">Harvinainen</li>{/if}
-    {#if found}<li class="tag bg-ok-soft">Löydetty</li>{/if}
+    {#if place.rare}<li class="tag bg-highlight-soft">{COPY.rare}</li>{/if}
+    {#if found}<li class="tag bg-ok-soft">{COPY.found}</li>{/if}
   </ul>
 {/if}
 
@@ -121,7 +122,7 @@
 
 {#if loading}
   <div class="mt-3" aria-busy="true">
-    <span class="sr-only">Ladataan…</span>
+    <span class="sr-only">{COPY.loading}</span>
     <span class="skeleton h-4 w-full"></span>
     <span class="skeleton mt-2 h-4 w-5/6"></span>
     <span class="skeleton mt-2 h-4 w-2/3"></span>
@@ -140,7 +141,7 @@
           icon="ph:arrow-clockwise"
           class="size-5"
           aria-hidden="true"
-        />Yritä uudelleen
+        />{COPY.retry}
       </button>
     </div>
   {/if}
@@ -160,7 +161,7 @@
 
 {#if app.story?.oldPhotos.length}
   <section class="mt-6" aria-labelledby="old-t">
-    <h3 id="old-t">Tältä se näytti ennen</h3>
+    <h3 id="old-t">{COPY.oldPhotosTitle}</h3>
     <ul class="-mx-gutter mt-2 flex gap-3 overflow-x-auto px-gutter pb-2">
       {#each app.story.oldPhotos as photo, i (i)}
         <li class="w-40 flex-none">
@@ -201,12 +202,11 @@
         icon="ph:check-circle"
         class="size-5"
         aria-hidden="true"
-      />{/if}Kävin täällä
+      />{/if}{COPY.visited}
   </button>
   {#if readMore}
     <a href={readMore} target="_blank" rel="noopener" class="btn-quiet">
-      <Icon icon="ph:arrow-up-right" class="size-5" aria-hidden="true" />Lue
-      lisää<span class="sr-only">, avautuu uuteen välilehteen</span>
+      <Icon icon="ph:arrow-up-right" class="size-5" aria-hidden="true" />{COPY.readMore}<span class="sr-only">, avautuu uuteen välilehteen</span>
     </a>
   {/if}
 </div>

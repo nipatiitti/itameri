@@ -15,6 +15,12 @@ export const SOURCES: SourceEntry[] = [
 		licence: '© OpenFreeMap, © OpenMapTiles, © OpenStreetMap contributors'
 	},
 	{
+		name: 'Nominatim',
+		description: 'Paikkahaku',
+		url: 'https://nominatim.org',
+		licence: 'OpenStreetMap Nominatim, © OpenStreetMap contributors, ODbL'
+	},
+	{
 		name: 'Museovirasto',
 		description: 'Muinaisjäännösrekisterin kohteet ja niiden tiedot',
 		url: 'https://www.museovirasto.fi',

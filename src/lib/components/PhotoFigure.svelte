@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Photo } from '$lib/types';
+	import { COPY } from '$lib/content/copy';
 
 	let { photo, loading, alt }: { photo?: Photo; loading: boolean; alt: string } = $props();
 
@@ -8,7 +9,7 @@
 </script>
 
 {#if loading}
-	<div class="skeleton aspect-[4/3] w-full" aria-busy="true"><span class="sr-only">Ladataan…</span></div>
+	<div class="skeleton aspect-[4/3] w-full" aria-busy="true"><span class="sr-only">{COPY.loading}</span></div>
 {:else if shown}
 	<figure>
 		<img

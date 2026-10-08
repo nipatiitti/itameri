@@ -5,6 +5,7 @@
 	import { map } from '$lib/state/map.svelte';
 	import { distanceM, formatDistance } from '$lib/data/geo';
 	import { CATEGORY_META } from '$lib/content/categories';
+	import { COPY } from '$lib/content/copy';
 
 	let { onpick }: { onpick: (place: Place) => void } = $props();
 
@@ -57,7 +58,7 @@
 							<span class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-fg-muted">
 								<span>{CATEGORY_META[place.category].single}</span>
 								<span>{formatDistance(distance)}</span>
-								{#if place.rare}<span class="tag bg-highlight-soft">Harvinainen</span>{/if}
+								{#if place.rare}<span class="tag bg-highlight-soft">{COPY.rare}</span>{/if}
 							</span>
 						</span>
 						<Icon icon="ph:caret-right" class="size-5 text-fg-muted" aria-hidden="true" />

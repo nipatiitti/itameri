@@ -339,6 +339,8 @@ Variants with bbox `FILTER(?lat > 53.5 && ?lat < 66 && ?lon > 9.5 && ?lon < 30.5
 
 ## C7. Lighthouses, dive wrecks, places
 
+- Geocoding: Nominatim `https://nominatim.openstreetmap.org/search?q=<q>&format=jsonv2&countrycodes=fi,se,ee&limit=5&accept-language=fi`, CORS ✅ `*`, no key, max 1 request/s, credit "© OpenStreetMap contributors, ODbL". Used for the place search (added during the event).
+
 - Lighthouses: Wikidata (C5) + Museovirasto RKY polygons + Väylävirasto `loistot_uusi`.
   Suomen Majakkaseura has no usable API.
 - **hylyt.net (3 016 dive sites)**: `https://hylyt.net/map.json` has no CORS ❌, but its CMS does:
