@@ -17,15 +17,19 @@ export async function fetchLegs(points: LngLat[], transport: Transport): Promise
 	if (!COSTING[transport]) return points.slice(1).map(() => null); // boats go straight over the water
 	const whole = await request(points, transport);
 	if (whole && whole.length === points.length - 1) return whole;
-	return Promise.all(
-		points.slice(1).map(async (p, i) => {
-			const leg = await request([points[i], p], transport);
-			return leg?.[0] ?? null;
-		})
-	);
+	// One leg at a time: the public server rate-limits bursts.
+	const legs: (RouteLeg | null)[] = [];
+	for (let i = 1; i < points.length; i++) {
+		if (i > 1) await sleep(700);
+		const leg = await request([points[i - 1], points[i]], transport);
+		legs.push(leg?.[0] ?? null);
+	}
+	return legs;
 }
 
-async function request(points: LngLat[], transport: Transport): Promise<RouteLeg[] | null> {
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function request(points: LngLat[], transport: Transport, retry = true): Promise<RouteLeg[] | null> {
 	if (points.length < 2) return null;
 	const ctrl = new AbortController();
 	const timer = setTimeout(() => ctrl.abort(), 12000);
@@ -40,6 +44,11 @@ async function request(points: LngLat[], transport: Transport): Promise<RouteLeg
 				units: 'kilometers'
 			})
 		});
+		if (res.status === 429 && retry) {
+			clearTimeout(timer);
+			await sleep(1500);
+			return request(points, transport, false);
+		}
 		if (!res.ok) return null;
 		const data = (await res.json()) as {
 			trip?: { legs?: { shape: string; summary?: { length: number; time: number } }[] };
