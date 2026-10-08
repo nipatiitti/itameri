@@ -64,7 +64,14 @@
         { label: "Laji", value: t["species:fi"] ?? t.species },
         { label: "Korkeus", value: metres(t.height) },
         { label: "Korkeus merenpinnasta", value: metres(t.ele) },
-        { label: "Ajoitus", value: t.ajoitus },
+        {
+          label: "Ajoitus",
+          value: t.ajoitus
+            ?.split(",")
+            .map((x) => x.trim())
+            .filter((x) => x && x !== "ei määritelty" && x !== "ajoittamaton")
+            .join(", "),
+        },
         { label: "Tyyppi", value: t.alatyyppi },
         { label: "Kunta", value: t.kunta },
         { label: "Teksti", value: t.inscription, wide: true },
