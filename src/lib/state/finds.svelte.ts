@@ -3,7 +3,7 @@ import { persisted } from './persisted.svelte';
 
 /** Places the user has marked as visited. Persisted. */
 export class FindsState {
-	#store = persisted<Find[]>('loytoretki.finds', []);
+	#store = persisted<Find[]>('arjen-aarteet.finds', []);
 	get list(): Find[] {
 		return this.#store.value;
 	}

@@ -3,14 +3,14 @@
 	import { SOURCES } from '$lib/content/sources';
 </script>
 
-<svelte:head><title>Tietoa, Löytöretki</title></svelte:head>
+<svelte:head><title>Tietoa, Arjen aarteet</title></svelte:head>
 
 <section class="bg-deep text-on-deep">
 	<div class="mx-auto max-w-content px-gutter py-10">
 		<p class="eyebrow">Tietoa palvelusta</p>
 		<h1 class="mt-2 font-display text-display text-on-deep">Tuttu ympäristö, uusin silmin</h1>
 		<p class="mt-3 text-on-deep-muted">
-			Löytöretki nostaa kartalle sen, minkä ohi kävelet joka päivä: nimetyt puut, pienet muistomerkit,
+			Arjen aarteet nostaa kartalle sen, minkä ohi kävelet joka päivä: nimetyt puut, pienet muistomerkit,
 			muinaisjäännökset, näköalat ja meren merkit. Jokaisella on tarina.
 		</p>
 	</div>

@@ -18,14 +18,14 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Löytöretki</title>
+	<title>Arjen aarteet</title>
 </svelte:head>
 
 <div class="flex min-h-dvh flex-col">
 	<header class="sticky top-0 z-20 bg-deep text-on-deep">
 		<div class="mx-auto flex h-bar max-w-wide items-center gap-3 px-gutter">
 			<span class="buoy" aria-hidden="true"></span>
-			<a href="/" class="font-display text-lg font-semibold text-on-deep no-underline">Löytöretki</a>
+			<a href="/" class="font-display text-lg font-semibold text-on-deep no-underline">Arjen aarteet</a>
 			<nav aria-label="Päävalikko" class="ml-auto hidden md:flex">
 				{#each items as item (item.href)}
 					<a href={item.href} class="bar-link" aria-current={current(item.href)}>{item.label}</a>
