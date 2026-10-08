@@ -65,12 +65,21 @@
 			type: 'line',
 			source: 'route',
 			layout: { 'line-join': 'round', 'line-cap': 'round' },
+			filter: ['!=', ['get', 'routed'], true],
 			paint: {
 				'line-color': MAP.select,
 				'line-width': 3,
 				'line-opacity': 0.7,
 				'line-dasharray': [2, 1.5]
 			}
+		});
+		mm.addLayer({
+			id: 'route-roads',
+			type: 'line',
+			source: 'route',
+			filter: ['==', ['get', 'routed'], true],
+			layout: { 'line-join': 'round', 'line-cap': 'round' },
+			paint: { 'line-color': MAP.select, 'line-width': 4, 'line-opacity': 0.75 }
 		});
 		mm.addLayer({
 			id: 'points',
@@ -237,11 +246,15 @@
 		const home = trip.plan.start;
 		const stops = trips.stopsOf(trip);
 		const ring = [home, ...stops, home].map((p) => [p.lon, p.lat]);
-		const line = trips.shapes[trip.id] ?? ring;
+		const segments = trips.shapes[trip.id] ?? [{ coords: ring as [number, number][], routed: false }];
 		untrack(() => trips.refine(trip.id));
 		setData(mm, 'route', {
 			type: 'FeatureCollection',
-			features: [{ type: 'Feature', geometry: { type: 'LineString', coordinates: line }, properties: {} }]
+			features: segments.map((s) => ({
+				type: 'Feature',
+				geometry: { type: 'LineString', coordinates: s.coords },
+				properties: { routed: s.routed }
+			}))
 		});
 		setData(
 			mm,

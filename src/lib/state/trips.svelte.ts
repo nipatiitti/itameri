@@ -1,4 +1,4 @@
-import type { Place, Trip, TripPlan } from '$lib/types';
+import type { LoadStatus, Place, Trip, TripPlan } from '$lib/types';
 import { persisted } from './persisted.svelte';
 import { planTrip } from '$lib/data/route';
 import { MOOD_META, STOP_MINUTES, TRANSPORT_META } from '$lib/content/trip';
@@ -25,8 +25,10 @@ export class TripsState {
 		if (this.activeId) this.fitSeq += 1;
 	}
 
-	/** Road-following shapes by trip id, filled by refine(). Missing means straight lines. */
-	shapes = $state<Record<string, [number, number][]>>({});
+	/** Route segments by trip id, filled by refine(): routed legs follow roads, the rest are straight hops. Missing means all straight. */
+	shapes = $state<Record<string, { coords: [number, number][]; routed: boolean }[]>>({});
+	/** Routing request state by trip id. */
+	routing = $state<Record<string, LoadStatus>>({});
 	#pending = new Map<string, string>();
 
 	/** Fetch the real route for a trip once per stop list; updates its length and time when it arrives. */
@@ -39,11 +41,16 @@ export class TripsState {
 		const stops = this.stopsOf(trip);
 		const points = [trip.plan.start, ...stops, trip.plan.start];
 		if (trip.plan.transport === 'boat') return;
+		this.routing = { ...this.routing, [id]: 'loading' };
 		const legs = await fetchLegs(points, trip.plan.transport);
-		if (this.#pending.get(id) !== key || !legs.some(Boolean)) return;
+		if (this.#pending.get(id) !== key) return;
+		if (!legs.some(Boolean)) {
+			this.routing = { ...this.routing, [id]: 'error' };
+			return;
+		}
 		// A leg that detours far beyond the straight line (ferry to the mainland and back) becomes a straight hop over the water.
 		const mps = (TRANSPORT_META[trip.plan.transport].kmh * 1000) / 3600;
-		const coords: [number, number][] = [];
+		const segments: { coords: [number, number][]; routed: boolean }[] = [];
 		let lengthM = 0;
 		let seconds = 0;
 		legs.forEach((leg, i) => {
@@ -51,16 +58,17 @@ export class TripsState {
 			const b = points[i + 1];
 			const straight = distanceM(a, b);
 			if (leg && leg.coords.length > 1 && leg.lengthM <= Math.max(straight * 3, straight + 1500)) {
-				coords.push(...leg.coords);
+				segments.push({ coords: leg.coords, routed: true });
 				lengthM += leg.lengthM;
 				seconds += leg.seconds;
 			} else {
-				coords.push([a.lon, a.lat], [b.lon, b.lat]);
+				segments.push({ coords: [[a.lon, a.lat], [b.lon, b.lat]], routed: false });
 				lengthM += straight;
 				seconds += straight / mps;
 			}
 		});
-		this.shapes = { ...this.shapes, [id]: coords };
+		this.shapes = { ...this.shapes, [id]: segments };
+		this.routing = { ...this.routing, [id]: 'ready' };
 		const minutes = Math.round(seconds / 60 + stops.length * STOP_MINUTES);
 		this.#store.value = this.#store.value.map((t) => (t.id === id ? { ...t, lengthM: Math.round(lengthM), minutes } : t));
 	}

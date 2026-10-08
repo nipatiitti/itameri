@@ -289,15 +289,17 @@
 				>
 					<Icon icon="ph:crosshair" aria-hidden="true" />
 				</button>
-				<button
-					type="button"
-					class="icon-btn pointer-events-auto"
-					aria-label="Vain harvinaiset"
-					aria-pressed={app.rareOnly}
-					onclick={() => app.toggleRare()}
-				>
-					<Icon icon="ph:star" aria-hidden="true" />
-				</button>
+				{#if !trips.active}
+					<button
+						type="button"
+						class="icon-btn pointer-events-auto"
+						aria-label="Vain harvinaiset"
+						aria-pressed={app.rareOnly}
+						onclick={() => app.toggleRare()}
+					>
+						<Icon icon="ph:star" aria-hidden="true" />
+					</button>
+				{/if}
 			</div>
 		</div>
 

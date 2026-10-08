@@ -4,6 +4,7 @@
 	import { formatMinutes } from '$lib/data/route';
 	import { fly } from 'svelte/transition';
 	import { trips } from '$lib/state/trips.svelte';
+	import { TRANSPORT_META } from '$lib/content/trip';
 
 	const date = new Intl.DateTimeFormat('fi-FI');
 </script>
@@ -26,6 +27,7 @@
 						<span class="min-w-0 flex-1">
 							<span class="block font-semibold">{trip.name}</span>
 							<span class="mt-1 flex flex-wrap gap-x-3 text-sm text-fg-muted">
+								<span>{TRANSPORT_META[trip.plan.transport].label}</span>
 								<span>{trip.stops.length} kohdetta</span>
 								<span>{formatDistance(trip.lengthM)}</span>
 								<span>{formatMinutes(trip.minutes)}</span>

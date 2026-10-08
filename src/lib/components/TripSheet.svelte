@@ -15,6 +15,8 @@
 	}: { trip: Trip; onpick: (place: Place) => void; onhide: () => void; collapsed?: boolean } = $props();
 
 	const stops = $derived(trips.stopsOf(trip));
+	const routing = $derived(trips.routing[trip.id]);
+	const hops = $derived((trips.shapes[trip.id] ?? []).filter((s) => !s.routed).length);
 </script>
 
 <p class="eyebrow">Retki</p>
@@ -26,6 +28,13 @@
 		<span>{formatDistance(trip.lengthM)}</span>
 		<span>{formatMinutes(trip.minutes)}</span>
 	</p>
+	{#if routing === 'loading'}
+		<p class="mt-2 text-sm text-fg-muted" aria-busy="true">Haetaan reittiä poluille ja kaduille.</p>
+	{:else if routing === 'error'}
+		<p class="mt-2 text-sm text-fg-muted">Reittipalvelu ei vastannut, reitti on suora viiva.</p>
+	{:else if hops}
+		<p class="mt-2 text-sm text-fg-muted">Katkoviiva on suora hyppy veden yli.</p>
+	{/if}
 
 	<ol class="-mx-gutter mt-3" aria-label="Kohteet">
 		{#each stops as place, i (place.id)}
