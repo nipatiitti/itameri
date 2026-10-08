@@ -1,7 +1,8 @@
 import type { Place, Trip, TripPlan } from '$lib/types';
 import { persisted } from './persisted.svelte';
 import { planTrip } from '$lib/data/route';
-import { MOOD_META } from '$lib/content/trip';
+import { MOOD_META, STOP_MINUTES } from '$lib/content/trip';
+import { fetchShape } from '$lib/data/routing';
 import { app } from './app.svelte';
 
 /** Saved trips (localStorage) and the one currently drawn on the map. */
@@ -20,6 +21,25 @@ export class TripsState {
 	}
 	fit() {
 		if (this.activeId) this.fitSeq += 1;
+	}
+
+	/** Road-following shapes by trip id, filled by refine(). Missing means straight lines. */
+	shapes = $state<Record<string, [number, number][]>>({});
+	#pending = new Map<string, string>();
+
+	/** Fetch the real route for a trip once per stop list; updates its length and time when it arrives. */
+	async refine(id: string) {
+		const trip = this.byId(id);
+		if (!trip) return;
+		const key = trip.stops.join(',');
+		if (this.#pending.get(id) === key) return;
+		this.#pending.set(id, key);
+		const stops = this.stopsOf(trip);
+		const shape = await fetchShape([trip.plan.start, ...stops, trip.plan.start], trip.plan.transport);
+		if (!shape || this.#pending.get(id) !== key) return;
+		this.shapes = { ...this.shapes, [id]: shape.coords };
+		const minutes = Math.round(shape.seconds / 60 + stops.length * STOP_MINUTES);
+		this.#store.value = this.#store.value.map((t) => (t.id === id ? { ...t, lengthM: shape.lengthM, minutes } : t));
 	}
 
 	get list(): Trip[] {
@@ -54,6 +74,8 @@ export class TripsState {
 		if (route.stops.length < 2) return null;
 		const next: Trip = { ...old, stops: route.stops.map((p) => p.id), lengthM: route.lengthM, minutes: route.minutes };
 		this.#store.value = this.#store.value.map((t) => (t.id === id ? next : t));
+		const { [id]: _, ...rest } = this.shapes;
+		this.shapes = rest;
 		return next;
 	}
 	rename(id: string, name: string) {

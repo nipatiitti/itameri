@@ -10,18 +10,27 @@ export interface PlannedRoute {
 
 /** Plan a loop from `plan.start` through the best places for the mood, ordered as a short round trip. Pure. */
 export function planTrip(plan: TripPlan, places: Place[]): PlannedRoute {
-	const cats = new Set(MOOD_META[plan.mood].categories);
+	const mood = MOOD_META[plan.mood];
+	const cats = new Set(mood.categories);
+	const weight = (p: Place) => mood.weight[p.category] ?? 1;
+	const lead = mood.categories.reduce((a, b) => ((mood.weight[a] ?? 1) >= (mood.weight[b] ?? 1) ? a : b));
 	const budget = BUDGET[plan.transport][plan.duration];
 	const start = plan.start;
 
+	// Wrecks lie under water; they are shown on the map but never routed to.
+	const visitable = (p: Place) => !/hylky|hylyt/.test(p.tags.tyyppi ?? '') && p.tags.historic !== 'wreck';
+
 	let radius = budget.radiusM;
 	let pool: Place[] = [];
-	for (let i = 0; i < 3 && pool.length < budget.stops; i++) {
-		pool = places.filter((p) => cats.has(p.category) && distanceM(start, p) <= radius);
+	const enough = () =>
+		pool.length >= budget.stops && pool.filter((p) => p.category === lead).length >= Math.ceil(budget.stops / 2);
+	for (let i = 0; i < 3 && !enough(); i++) {
+		pool = places.filter((p) => cats.has(p.category) && visitable(p) && distanceM(start, p) <= radius);
 		radius *= 1.8;
 	}
 
 	const score = (p: Place) =>
+		weight(p) * 1.5 +
 		(p.rare ? 2 : 0) +
 		(p.wikipedia || p.wikidata ? 1.5 : 0) +
 		(p.image ? 0.5 : 0) +
@@ -30,7 +39,7 @@ export function planTrip(plan: TripPlan, places: Place[]): PlannedRoute {
 		Math.random() * 0.4;
 
 	const ranked = pool.map((p) => ({ p, s: score(p) })).sort((a, b) => b.s - a.s);
-	const perCat = Math.ceil(budget.stops / cats.size) + 1;
+	const perCat = (c: string) => (c === lead ? budget.stops : Math.ceil(budget.stops / cats.size));
 	const count = new Map<string, number>();
 	const chosen: Place[] = [];
 	const tooClose = (p: Place) => chosen.some((c) => distanceM(c, p) < 80);
@@ -39,7 +48,7 @@ export function planTrip(plan: TripPlan, places: Place[]): PlannedRoute {
 			if (chosen.length >= budget.stops) break;
 			if (chosen.includes(p) || tooClose(p)) continue;
 			const n = count.get(p.category) ?? 0;
-			if (pass && n >= perCat) continue;
+			if (pass && n >= perCat(p.category)) continue;
 			chosen.push(p);
 			count.set(p.category, n + 1);
 		}

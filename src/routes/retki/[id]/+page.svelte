@@ -33,6 +33,10 @@
 		});
 	});
 
+	$effect(() => {
+		if (trip && app.status === 'ready') untrack(() => trips.refine(trip.id));
+	});
+
 	/** "1 h 20 min" → [["1", "h"], ["20", "min"]] so each number gets its own unit span. */
 	function pairs(text: string): string[][] {
 		const words = text.split(/\s+/);
@@ -81,7 +85,7 @@
 			{/each}
 		</dl>
 		<p class="mt-3 text-sm text-fg-muted">
-			Lähtö: {trip.plan.startName ?? 'valittu piste'}. Reitti on suora viiva kohteiden välillä, ei reittiohje.
+			Lähtö: {trip.plan.startName ?? 'valittu piste'}. Reitti seuraa katuja ja polkuja, kun reittipalvelu vastaa. Ei navigointikäyttöön.
 		</p>
 
 		{#if app.status === 'loading' || app.status === 'idle'}
@@ -109,7 +113,7 @@
 					</li>
 				{/each}
 			</ol>
-			<p class="mt-3 text-xs text-fg-muted">Lähde: OpenStreetMap ja Museovirasto</p>
+			<p class="mt-3 text-xs text-fg-muted">Lähde: OpenStreetMap, Museovirasto ja Valhalla</p>
 		{/if}
 
 		<button type="button" class="btn-primary mt-6 w-full" onclick={showOnMap}>Näytä kartalla</button>

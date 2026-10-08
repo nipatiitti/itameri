@@ -237,9 +237,11 @@
 		const home = trip.plan.start;
 		const stops = trips.stopsOf(trip);
 		const ring = [home, ...stops, home].map((p) => [p.lon, p.lat]);
+		const line = trips.shapes[trip.id] ?? ring;
+		untrack(() => trips.refine(trip.id));
 		setData(mm, 'route', {
 			type: 'FeatureCollection',
-			features: [{ type: 'Feature', geometry: { type: 'LineString', coordinates: ring }, properties: {} }]
+			features: [{ type: 'Feature', geometry: { type: 'LineString', coordinates: line }, properties: {} }]
 		});
 		setData(
 			mm,

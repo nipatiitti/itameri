@@ -2,31 +2,37 @@ import type { Category, Duration, Mood, Transport } from '$lib/types';
 
 // Lead-written; content-worker may polish words, not keys.
 
-export const MOOD_META: Record<Mood, { label: string; blurb: string; categories: Category[] }> = {
+/** `weight`: how much each category counts for the mood; the heaviest one leads and gets at least half the stops when available. */
+export const MOOD_META: Record<Mood, { label: string; blurb: string; categories: Category[]; weight: Partial<Record<Category, number>> }> = {
 	calm: {
 		label: 'Rauhoittumista',
 		blurb: 'Puistoja, vanhoja puita ja näköaloja, joissa hengitys tasaantuu.',
-		categories: ['park', 'tree', 'viewpoint']
+		categories: ['park', 'tree', 'viewpoint'],
+		weight: { park: 2, tree: 1.5, viewpoint: 1 }
 	},
 	urban: {
 		label: 'Kaupungin kummallisuuksia',
 		blurb: 'Taidetta, muistolaattoja ja arjen arvoituksia kadunkulmissa.',
-		categories: ['memorial', 'oddity', 'building']
+		categories: ['memorial', 'oddity', 'building'],
+		weight: { oddity: 2, memorial: 1.5, building: 1 }
 	},
 	woods: {
 		label: 'Metsän kätköjä',
 		blurb: 'Muinaisjäännöksiä, lähteitä ja siirtolohkareita polkujen varrella.',
-		categories: ['ancient', 'tree', 'viewpoint']
+		categories: ['ancient', 'tree', 'viewpoint'],
+		weight: { ancient: 2, tree: 1.5, viewpoint: 0.5 }
 	},
 	sea: {
 		label: 'Meren ääreen',
 		blurb: 'Majakoita, merimerkkejä ja hylkyjä, joista meri kertoo.',
-		categories: ['maritime', 'viewpoint', 'ancient']
+		categories: ['maritime', 'viewpoint', 'ancient'],
+		weight: { maritime: 2, viewpoint: 1, ancient: 0.3 }
 	},
 	history: {
 		label: 'Historian jälkiä',
 		blurb: 'Kartanoita, kirkkoja ja muistomerkkejä, joilla on kerrottavaa.',
-		categories: ['building', 'ancient', 'memorial']
+		categories: ['building', 'ancient', 'memorial'],
+		weight: { building: 2, ancient: 1.5, memorial: 1 }
 	}
 };
 

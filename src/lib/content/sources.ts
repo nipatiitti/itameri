@@ -21,6 +21,12 @@ export const SOURCES: SourceEntry[] = [
 		licence: 'OpenStreetMap Nominatim, © OpenStreetMap contributors, ODbL'
 	},
 	{
+		name: 'Valhalla (FOSSGIS)',
+		description: 'Retkien reitit kävellen, pyörällä ja autolla',
+		url: 'https://valhalla.openstreetmap.de',
+		licence: 'FOSSGIS e.V., reitit OpenStreetMap-datasta, ODbL'
+	},
+	{
 		name: 'Museovirasto',
 		description: 'Muinaisjäännösrekisterin kohteet ja niiden tiedot',
 		url: 'https://www.museovirasto.fi',

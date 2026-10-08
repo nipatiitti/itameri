@@ -93,14 +93,18 @@ The app then plans a loop that starts and ends at your start point. Places are s
 whether a story or photo is available, and distance from the start, with a cap per category so
 the trip stays varied and no two stops closer than about 80 m. The stops are ordered with a
 nearest-neighbour pass and then improved with 2-opt to shorten the loop. The trip page shows the
-stops, the straight-line length of the loop, and an estimated time: the length at a typical speed
-for the transport (walking 4.5 km/h, cycling 15 km/h, driving 40 km/h) plus 10 minutes per stop.
+stops, the length of the loop, and an estimated time. The first estimate is a straight-line sketch
+at a typical speed for the transport (walking 4.5 km/h, cycling 15 km/h, driving 40 km/h) plus
+10 minutes per stop. The app then asks the public Valhalla routing server run by FOSSGIS
+(valhalla1.openstreetmap.de, no key) for a real route on paths and roads with the matching
+profile, draws it on the map, and replaces the length and time with Valhalla's figures. If the
+server is slow or unreachable, the straight-line loop stays.
 
 Trips are saved in your browser. You can re-plan a trip with the same answers, rename it, delete
 it, or show it on the main map, where it is drawn as a dashed loop with numbered stops.
 
-**The route is a straight-line sketch, not turn-by-turn directions.** Lines cross water, buildings
-and private land, and the real distance on paths and roads is longer. It is not for navigation.
+**The route is a sketch, not turn-by-turn directions.** Without the routing server the line
+crosses water, buildings and private land. It is not for navigation.
 
 ## Data sources and licences
 
@@ -162,7 +166,7 @@ Re-run the scripts to refresh the data.
   a story can occasionally fail to load. Try again a moment later.
 - Some places are on private land or protected sites. Respect signs, landowners and the
   ancient monuments act; do not dig or move anything.
-- Distances and Retki routes are straight lines, and trip times are rough estimates. **Not for
+- Distances are straight lines, Retki routes come from a public routing server when it answers, and trip times are rough estimates. **Not for
   navigation** (Ei navigointikäyttöön).
 - Finds and trips live only in this browser. Clearing site data removes them, and they do not
   sync between devices.
