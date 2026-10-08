@@ -103,7 +103,8 @@ long detour (a ferry to the mainland between two islets) are drawn as straight h
 By boat the loop is always straight lines, and shipwrecks can be stops.
 
 Trips are saved in your browser. You can re-plan a trip with the same answers, rename it, delete
-it, or show it on the main map, where it is drawn as a dashed loop with numbered stops.
+it, share it, or show it on the main map, where it is drawn as a loop with numbered stops. A share
+link carries the whole trip in its address, so it opens on any device without a server.
 
 **The route is a sketch, not turn-by-turn directions.** Without the routing server the line
 crosses water, buildings and private land. It is not for navigation.

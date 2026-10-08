@@ -24,6 +24,31 @@
 
 	let name = $state('');
 	let rerollFailed = $state(false);
+	let shared = $state<'copied' | 'failed' | null>(null);
+
+	// A shared link carries the trip itself; import it when this browser does not have it.
+	$effect(() => {
+		const code = page.url.searchParams.get('t');
+		const id = page.params.id ?? '';
+		untrack(() => {
+			if (code && !trips.byId(id)) trips.importShared(code);
+		});
+	});
+
+	async function share() {
+		if (!trip) return;
+		const url = `${location.origin}/retki/${trip.id}?t=${trips.encode(trip)}`;
+		try {
+			if (navigator.share) {
+				await navigator.share({ title: `${trip.name}, Arjen aarteet`, url });
+				return;
+			}
+			await navigator.clipboard.writeText(url);
+			shared = 'copied';
+		} catch {
+			shared = 'failed';
+		}
+	}
 
 	$effect(() => {
 		const id = page.params.id ?? '';
@@ -129,8 +154,16 @@
 			>
 				<Icon icon="ph:arrow-clockwise" class="size-5" aria-hidden="true" />Arvo uudelleen
 			</button>
+			<button type="button" class="btn-quiet" onclick={share}>
+				<Icon icon="ph:link" class="size-5" aria-hidden="true" />Jaa
+			</button>
 			<button type="button" class="btn-quiet" onclick={remove}>Poista</button>
 		</div>
+		{#if shared === 'copied'}
+			<p role="status" class="notice mt-3 bg-info-soft">Linkki kopioitu leikepöydälle. Retki kulkee linkin mukana.</p>
+		{:else if shared === 'failed'}
+			<p role="status" class="notice mt-3 bg-warn-soft">Linkkiä ei saatu kopioitua. Kopioi osoite selaimen osoiteriviltä.</p>
+		{/if}
 
 		<form class="mt-8" onsubmit={rename}>
 			<label for="trip-name" class="block text-sm font-semibold">Retken nimi</label>

@@ -116,6 +116,26 @@ export class TripsState {
 		this.#store.value = this.#store.value.filter((t) => t.id !== id);
 		if (this.activeId === id) this.activeId = null;
 	}
+	/** The trip as a URL-safe code for sharing; the receiver imports it with importShared(). */
+	encode(trip: Trip): string {
+		const json = JSON.stringify(trip);
+		return btoa(unescape(encodeURIComponent(json))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+	}
+	/** Add a shared trip to the list (once) and return it, or null when the code is not a trip. */
+	importShared(code: string): Trip | null {
+		try {
+			const json = decodeURIComponent(escape(atob(code.replace(/-/g, '+').replace(/_/g, '/'))));
+			const t = JSON.parse(json) as Trip;
+			if (!t || typeof t.id !== 'string' || !Array.isArray(t.stops) || !t.plan?.start) return null;
+			const existing = this.byId(t.id);
+			if (existing) return existing;
+			const trip: Trip = { ...t, name: String(t.name || MOOD_META[t.plan.mood]?.label || 'Jaettu retki') };
+			this.#store.value = [trip, ...this.#store.value];
+			return trip;
+		} catch {
+			return null;
+		}
+	}
 	/** Resolved stops of a trip (places that still exist in the data). */
 	stopsOf(trip: Trip): Place[] {
 		return trip.stops.map((id) => app.byId(id)).filter((p): p is Place => !!p);
