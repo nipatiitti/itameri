@@ -1,34 +1,31 @@
 # Arjen aarteet
 
-**Suomeksi lyhyesti.** Arjen aarteet on löytöretki omaan lähiympäristöösi. Kartta näyttää lähelläsi
-olevat nimetyt puut, muistomerkit, muinaisjäännökset, majakat, hylyt, näköalat ja muut pienet
-ihmeet, ja jokaisesta paikasta kuvan ja tarinan. Paina Yllätä minut, niin kartta vie sinut
-satunnaiseen aarteeseen läheltäsi. Retki-välilehdellä valitset tunnelman, kulkutavan, keston ja
-lähtöpaikan, ja sovellus suunnittelee sinulle kierroksen parhaiden paikkojen kautta. Kun olet
-käynyt paikalla, paina Kävin täällä, niin löytö tallentuu selaimeesi. Sovellus toimii kokonaan
-selaimessa, eikä se tarvitse kirjautumista tai avaimia.
+Päivittäin ihmiset kävelevät ohi historiallisista muinaisjäänteistä, mielenkiintoisista plakaateista ja arvokkaista taideteoksista, edes tiedostamatta niitten olemassa oloa. Nämä täynnä tarinoita olevat asiat, ovat ns. "Arjen aarteita". Kulttuurillisesti merkittäviä kohteita, joita kuka vaan voi ihailla koska vaan, mutta joiden olemassa olosta liian harva tietää.
+
+Tämän sovelluksen ideana on tarjota jokaiselle mahdollisuus irtaantua arjestaan pieneksi hetkeksi, löytää mielenkiintoinen tarina, hiljainen puisto tai ajatuksia herättävä urbaani taideteos. Oli se sitten keskellä metsää tai kaupungin keskustassa.
+
+Arjen aarteet on pelkästään selaimessa toimiva kartta, joka rakentuu OpenStreetMapin datasta ja Museoviraston muinaisjäännösrekisteristä. Avaa mikä tahansa kohde, niin sovellus hakee sille kuvan ja lyhyen tarinan Wikipediasta, Wikidatasta, Wikimedia Commonsista ja Finnasta, mukaan lukien vanhat valokuvat samasta paikasta, kun niitä on. **Retki**-välilehti suunnittelee lyhyen seikkailulenkin parhaiden kohteiden kautta valitsemasi lähtöpisteen ympärillä. Sovellus tehtiin Softamestari 2026 -karsintaan teemalla Löytöretki, teemakumppanina John Nurmisen Säätiö.
+
+**Unohda murheet ja hyppää Arjen Aarteiden Löytöretkelle!**
 
 ---
 
-Arjen aarteet ("everyday treasures") is a browser-only map of hidden gems in your everyday
-surroundings: named trees, small memorials, ancient monuments, lighthouses, shipwrecks, viewpoints
-and other quiet curiosities, built on OpenStreetMap data and the Finnish Heritage Agency's ancient
-monuments register. Open any place and the app fetches a photo and a short story for it from
-Wikipedia, Wikidata, Wikimedia Commons and Finna, including old photographs of the same spot when
-they exist. The **Retki** tab plans a short adventure loop through the best places around a start
-point you choose. It was built for the Softamestari 2026 qualifier, theme Löytöretki (expedition),
-with John Nurmisen Säätiö as the theme partner.
+Every day people walk past ancient remains, curious plaques and valuable works of art without
+knowing they are there. These things, full of stories, are what we call "everyday treasures":
+culturally significant places anyone can admire at any time, but that too few know exist.
 
-## The demo moment
+The idea of this app is to give everyone a chance to step out of the everyday for a moment and
+find an interesting story, a quiet park or a thought-provoking piece of urban art, whether in the
+middle of a forest or in a city centre.
 
-Press **Yllätä minut** ("Surprise me"). The map flies to a random place near you and opens its card
-with a picture and a story. Often it is something you have walked past a hundred times without
-noticing: a cup-marked stone, a named oak, a boundary stone, marked **Harvinainen** ("rare") when
-its kind is uncommon. Scroll down and **Näin se näytti ennen** shows how the place looked decades
-ago, from museum photo archives.
+Arjen aarteet is a browser-only map built on OpenStreetMap data and the Finnish Heritage Agency's
+ancient monuments register. Open any place and the app fetches a photo and a short story for it
+from Wikipedia, Wikidata, Wikimedia Commons and Finna, including old photographs of the same spot
+when they exist. The **Retki** tab plans a short adventure loop through the best places around a
+start point you choose. It was built for the Softamestari 2026 qualifier, theme Löytöretki
+(expedition), with John Nurmisen Säätiö as the theme partner.
 
-Then open **Retki**, answer four one-tap questions, and the app draws an afternoon's loop through
-the most interesting places nearby.
+**Forget your worries and set off on an expedition for everyday treasures!**
 
 ## Run it
 
@@ -83,8 +80,9 @@ A four-step wizard, one tap per step:
 
 1. **Mood**: calm (Rauhoittumista), urban curiosities (Kaupungin kummallisuuksia), hidden in the
    woods (Metsän kätköjä), by the sea (Meren ääreen) or traces of history (Historian jälkiä). Each
-   mood maps to three place categories.
-2. **Transport**: walking, cycling or driving.
+   mood maps to three place categories with weights; the lead category gets at least half the
+   stops when enough are around.
+2. **Transport**: walking, cycling, driving or by boat.
 3. **Duration**: about an hour, a couple of hours or half a day. Together with the transport this
    sets the search radius and the number of stops (4 to 9).
 4. **Start point**: move the map under a crosshair, search for a place, or use your location.
@@ -92,7 +90,8 @@ A four-step wizard, one tap per step:
 The app then plans a loop that starts and ends at your start point. Places are scored by rarity,
 whether a story or photo is available, and distance from the start, with a cap per category so
 the trip stays varied and no two stops closer than about 80 m. The stops are ordered with a
-nearest-neighbour pass and then improved with 2-opt to shorten the loop. The trip page shows the
+nearest-neighbour pass and then improved with 2-opt to shorten the loop. If the estimate still
+exceeds the chosen duration, the stop with the longest detour is dropped until it fits. The trip page shows the
 stops, the length of the loop, and an estimated time. The first estimate is a straight-line sketch
 at a typical speed for the transport (walking 4.5 km/h, cycling 15 km/h, driving 40 km/h, boating 10 km/h) plus
 10 minutes per stop. The app then asks the public Valhalla routing server run by FOSSGIS
@@ -103,32 +102,26 @@ long detour (a ferry to the mainland between two islets) are drawn as straight h
 By boat the loop is always straight lines, and shipwrecks can be stops.
 
 Trips are saved in your browser. You can re-plan a trip with the same answers, rename it, delete
-it, share it, or show it on the main map, where it is drawn as a loop with numbered stops. A share
-link carries the whole trip in its address, so it opens on any device without a server.
-
-**The route is a sketch, not turn-by-turn directions.** Without the routing server the line
-crosses water, buildings and private land. It is not for navigation.
-
-### Museovirasto descriptions
-
-`scripts/fetch-kyppi.mjs` reads the "Kuvaus" paragraph of every Museovirasto place from its
-kyppi.fi record page once and stores it as `kuvaus` in the GeoJSON (cut at about 700 characters).
-The app shows it as the place's text when no Wikipedia article matches. Run it again with
-`node scripts/fetch-kyppi.mjs` to refresh; it is time-capped and keeps what it got.
+it, share it, or show it on the main map, where it is drawn as a loop with numbered stops and the
+other places are hidden. **Aloita retki** opens the first stop, and the place card then steps
+through the stops in order. A share link carries the whole trip in its address, so it opens on any
+device without a server.
 
 ## Data sources and licences
 
-| Source | Used for | Licence |
-| --- | --- | --- |
-| [OpenStreetMap](https://www.openstreetmap.org/copyright) | Places, names and facts (static extracts) | © OpenStreetMap contributors, ODbL |
-| [OpenFreeMap](https://openfreemap.org) | Basemap (positron style) | © OpenFreeMap, © OpenMapTiles, © OpenStreetMap contributors |
-| [Nominatim](https://nominatim.org) | Place search, live, one request per submitted search (usage policy: at most 1 request per second) | © OpenStreetMap contributors, ODbL |
-| [Museovirasto](https://www.museovirasto.fi) (Finnish Heritage Agency) | Ancient monuments register: ancient sites | Museovirasto, CC BY 4.0 |
-| [Museovirasto](https://www.museovirasto.fi) (Finnish Heritage Agency) | Ancient monuments register: 702 shipwrecks, each linked to its kyppi.fi page | Museovirasto, CC BY 4.0 |
-| [Wikipedia](https://fi.wikipedia.org) | Stories (Finnish first, then Swedish and English) | CC BY-SA 4.0 |
-| [Wikidata](https://www.wikidata.org) | Identifiers and image links | CC0 |
-| [Wikimedia Commons](https://commons.wikimedia.org) | Photos | Per image, shown with the image |
-| [Finna](https://www.finna.fi) | Historical photos from Finnish museums and archives | Per record, free licences only (CC0, PDM, CC BY), shown with the organisation |
+| Source                                                                 | Used for                                                                                          | Licence                                                                       |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [OpenStreetMap](https://www.openstreetmap.org/copyright)               | Places, names and facts (static extracts)                                                         | © OpenStreetMap contributors, ODbL                                            |
+| [OpenFreeMap](https://openfreemap.org)                                 | Basemap (positron style)                                                                          | © OpenFreeMap, © OpenMapTiles, © OpenStreetMap contributors                   |
+| [Nominatim](https://nominatim.org)                                     | Place search, live, one request per submitted search (usage policy: at most 1 request per second) | © OpenStreetMap contributors, ODbL                                            |
+| [Museovirasto](https://www.museovirasto.fi) (Finnish Heritage Agency)  | Ancient monuments register: ancient sites                                                         | Museovirasto, CC BY 4.0                                                       |
+| [Museovirasto](https://www.museovirasto.fi) (Finnish Heritage Agency)  | Ancient monuments register: 702 shipwrecks, each linked to its kyppi.fi page                      | Museovirasto, CC BY 4.0                                                       |
+| [Wikipedia](https://fi.wikipedia.org)                                  | Stories (Finnish first, then Swedish and English)                                                 | CC BY-SA 4.0                                                                  |
+| [Wikidata](https://www.wikidata.org)                                   | Identifiers and image links                                                                       | CC0                                                                           |
+| [Wikimedia Commons](https://commons.wikimedia.org)                     | Photos                                                                                            | Per image, shown with the image                                               |
+| [Finna](https://www.finna.fi)                                          | Historical photos from Finnish museums and archives                                               | Per record, free licences only (CC0, PDM, CC BY), shown with the organisation |
+| [Valhalla public server](https://valhalla.openstreetmap.de) by FOSSGIS | Retki routes on paths and roads, live, no key                                                     | FOSSGIS e.V., routes from OpenStreetMap data, ODbL                            |
+| [kyppi.fi](https://www.kyppi.fi) (Museovirasto)                        | Descriptions of ancient monuments and wrecks, fetched once by script                              | Museovirasto, CC BY 4.0                                                       |
 
 The same attributions appear in the app on the **Tietoa** page, and every photo carries its own
 credit line and link.
@@ -136,8 +129,10 @@ credit line and link.
 ### How a place gets its photo
 
 The app tries these in order and stops at the first hit: the image tag on the OpenStreetMap object,
-the Wikidata image (P18), the Wikipedia page summary, a Wikimedia Commons photo taken within about
-150 m, and a Finna photo near the spot. If none exists, the card shows a neutral placeholder.
+the Wikidata image (P18), the Wikipedia page summary, and a Wikimedia Commons photo taken within
+about 100 m whose title or description mentions the place. Finna photos are shown only when the
+record's own location lies at the spot. If nothing matches, the card simply has no photo; a wrong
+picture is worse than none.
 
 ## How the static extracts were made
 
@@ -179,7 +174,9 @@ Re-run the scripts to refresh the data.
 - Distances are straight lines, Retki routes come from a public routing server when it answers, and trip times are rough estimates. **Not for
   navigation** (Ei navigointikäyttöön).
 - Finds and trips live only in this browser. Clearing site data removes them, and they do not
-  sync between devices.
+  sync between devices. A trip can be moved with its share link.
+- The routing server is a public, fair-use service. A burst of trips in a row can be rate-limited,
+  in which case the loop stays a straight-line sketch.
 
 ## Credits
 
@@ -188,7 +185,8 @@ Built for the **Softamestari 2026** qualifier, theme Löytöretki. Theme partner
 Baltic Sea and its maritime heritage.
 
 Map data and place search © OpenStreetMap contributors. Basemap by OpenFreeMap and OpenMapTiles.
-Heritage data and shipwrecks by Museovirasto. Stories and photos from Wikipedia, Wikidata,
-Wikimedia Commons and Finna, each credited where it is shown.
+Heritage data, descriptions and shipwrecks by Museovirasto. Stories and photos from Wikipedia,
+Wikidata, Wikimedia Commons and Finna, each credited where it is shown. Routes by the Valhalla
+public server run by FOSSGIS.
 
 Built with SvelteKit, Svelte 5, MapLibre GL and Tailwind CSS.
