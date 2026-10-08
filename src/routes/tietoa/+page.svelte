@@ -19,9 +19,19 @@
 <div class="mx-auto max-w-content px-gutter py-8">
 	<h2>Miten sovellus toimii</h2>
 	<p class="mt-2">
-		Kartalla näkyvät paikat tulevat OpenStreetMapista. Kun avaat paikan, sovellus hakee sille kuvan ja
-		tarinan Wikipediasta ja Finnasta. Painike Yllätä minut valitsee satunnaisen paikan läheltäsi.
-		Kun olet käynyt paikalla, merkitse se löydetyksi, niin se tallentuu selaimeesi.
+		Kartalla näkyvät paikat tulevat OpenStreetMapista ja Museoviraston muinaisjäännösrekisteristä,
+		myös yli 700 hylkyä Suomen rannikolta. Kun avaat paikan, sovellus hakee sille kuvan ja tarinan
+		Wikipediasta, Wikimedia Commonsista ja Finnasta. Painike Yllätä minut valitsee satunnaisen paikan
+		läheltäsi, ja tähti rajaa kartan harvinaisiin löytöihin. Kun olet käynyt paikalla, merkitse se
+		löydetyksi, niin se tallentuu selaimeesi.
+	</p>
+
+	<h2 class="mt-8">Retki</h2>
+	<p class="mt-2">
+		Retki-välilehdellä suunnittelet kierroksen neljällä napautuksella: tunnelma, kulkutapa, kesto ja
+		lähtöpiste. Sovellus valitsee parhaat aarteet lähistöltä, suosii harvinaisia ja tarinallisia
+		paikkoja ja järjestää ne lenkiksi. Reitti on suora viiva kohteiden välillä, ei reittiohje. Retket
+		tallentuvat selaimeesi.
 	</p>
 
 	<h2 class="mt-8">Mistä tiedot tulevat</h2>
