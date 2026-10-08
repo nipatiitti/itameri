@@ -1,12 +1,7 @@
 <script lang="ts">
 	import type { Photo } from '$lib/types';
 
-	let {
-		photo,
-		loading,
-		alt,
-		fallback
-	}: { photo?: Photo; loading: boolean; alt: string; fallback: string } = $props();
+	let { photo, loading, alt }: { photo?: Photo; loading: boolean; alt: string } = $props();
 
 	let failedUrl = $state<string | null>(null);
 	const shown = $derived(photo && photo.url !== failedUrl ? photo : undefined);
@@ -31,8 +26,4 @@
 			{/if}
 		</figcaption>
 	</figure>
-{:else}
-	<div class="flex aspect-[4/3] w-full items-center justify-center rounded-control bg-sunken text-sm text-fg-muted">
-		{fallback}
-	</div>
 {/if}

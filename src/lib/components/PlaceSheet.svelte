@@ -109,7 +109,6 @@
     photo={app.story?.hero}
     {loading}
     alt={place.name}
-    fallback={meta.single}
   />
 </div>
 
