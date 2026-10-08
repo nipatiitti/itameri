@@ -18,6 +18,9 @@
 	let emptyTimer: ReturnType<typeof setTimeout> | undefined;
 	let restored = $state(false);
 	let sheet = $state<HTMLElement>();
+	let aside = $state<HTMLElement>();
+	const wideQuery = window.matchMedia('(min-width: 48rem)');
+	let wide = $state(wideQuery.matches);
 	let searching = $state(false);
 	let searchButton = $state<HTMLButtonElement>();
 
@@ -72,24 +75,73 @@
 	});
 
 	$effect(() => {
+		const update = () => (wide = wideQuery.matches);
+		wideQuery.addEventListener('change', update);
+		return () => wideQuery.removeEventListener('change', update);
+	});
+
+	$effect(() => {
 		void app.selectedId;
 		if (sheet) sheet.scrollTop = 0;
+		if (aside) aside.scrollTop = 0;
 	});
 </script>
 
 <svelte:head><title>Kartta, Arjen aarteet</title></svelte:head>
 <h1 class="sr-only">Kartta</h1>
 
-<div class="fixed inset-x-0 top-bar bottom-dock md:bottom-0">
-	<PlacesMap />
-
-	<div
-		class="pointer-events-none absolute inset-x-0 top-3 z-10 flex flex-col gap-2 md:top-4 md:right-[calc(var(--container-panel)+var(--spacing-gutter)*2)] md:flex-row md:items-start md:pl-gutter"
+<div class="fixed inset-x-0 top-bar bottom-dock md:bottom-0 md:flex">
+	<aside
+		bind:this={aside}
+		aria-label="Aarteet"
+		class="contents md:relative md:z-10 md:flex md:w-panel md:flex-none md:flex-col md:gap-5 md:overflow-y-auto md:border-r md:bg-surface md:px-gutter md:py-5 lg:w-[28rem]"
 	>
-		<div class="pointer-events-auto min-w-0 md:flex-1">
-			<CategoryChips />
-		</div>
-		<div class="flex min-w-0 flex-col items-end gap-2 px-gutter md:px-0">
+		<section aria-labelledby="filter-t" class="absolute inset-x-0 top-3 z-10 md:static">
+			<h2 id="filter-t" class="sr-only font-sans text-base font-semibold md:not-sr-only">Mitä etsit?</h2>
+			<div class="md:mt-3">
+				<CategoryChips />
+			</div>
+		</section>
+
+		{#if app.status === 'ready'}
+			<div
+				class={[
+					'pointer-events-none absolute inset-x-0 bottom-0 z-30 flex flex-col md:pointer-events-auto md:static md:gap-5',
+					searching && 'max-md:hidden'
+				]}
+			>
+				<div class="flex flex-col items-center gap-2 px-gutter pb-4 md:items-stretch md:px-0 md:pb-0">
+					{#if empty}
+						<p role="status" class="notice pointer-events-auto bg-info-soft">
+							{COPY.surpriseEmpty}
+						</p>
+					{/if}
+					<button type="button" class="btn-primary pointer-events-auto md:w-full" onclick={surprise}>
+						<Icon icon="ph:magnifying-glass" class="size-5" aria-hidden="true" />{COPY.surprise}
+					</button>
+				</div>
+
+				<section
+					bind:this={sheet}
+					class={wide
+						? '-mx-gutter border-t px-gutter pt-5'
+						: 'sheet pointer-events-auto relative max-h-[60dvh] overflow-y-auto'}
+					aria-labelledby="sheet-t"
+				>
+					{#if app.selected}
+						<PlaceSheet place={app.selected} onclose={() => app.select(null)} />
+					{:else}
+						<NearbyList onpick={show} />
+					{/if}
+				</section>
+			</div>
+		{/if}
+	</aside>
+
+	<div class="absolute inset-0 md:relative md:min-w-0 md:flex-1">
+		<PlacesMap />
+
+		<div class="pointer-events-none absolute inset-x-0 top-16 z-10 flex flex-col items-end gap-2 px-gutter md:top-4">
 			<div class="pointer-events-auto flex flex-col gap-2">
 				<button
 					bind:this={searchButton}
@@ -116,66 +168,32 @@
 				</button>
 			</div>
 			{#if searching}
-				<div class="pointer-events-auto w-full max-w-full md:w-panel">
+				<div class="pointer-events-auto w-full md:w-panel md:max-w-full">
 					<PlaceSearch onclose={closeSearch} />
 				</div>
 			{/if}
 		</div>
-	</div>
 
-	{#if app.status === 'loading' || app.status === 'idle'}
-		<div class="pointer-events-none absolute inset-x-0 top-36 z-10 flex justify-center px-gutter">
-			<section class="panel w-64" aria-busy="true">
-				<span class="sr-only">{COPY.loading}</span>
-				<span class="skeleton h-4 w-24"></span>
-				<span class="skeleton mt-3 h-6 w-3/4"></span>
-				<span class="skeleton mt-3 h-4 w-1/2"></span>
-			</section>
-		</div>
-	{:else if app.status === 'error'}
-		<div class="pointer-events-none absolute inset-x-0 top-36 z-10 flex justify-center px-gutter">
-			<section class="panel pointer-events-auto w-full max-w-sm text-center" aria-labelledby="error-t">
-				<Icon icon="ph:warning-circle" class="mx-auto size-10 text-danger" aria-hidden="true" />
-				<h2 id="error-t" class="mt-3">Aarteita ei saatu haettua</h2>
-				<p class="mt-1 text-sm text-fg-muted">{COPY.errorBody}</p>
-				<button type="button" class="btn-primary mt-4" onclick={retry}>
-					<Icon icon="ph:arrow-clockwise" class="size-5" aria-hidden="true" />{COPY.retry}
-				</button>
-			</section>
-		</div>
-	{/if}
-
-	{#if app.status === 'ready'}
-		<div
-			class={[
-				'pointer-events-none absolute inset-x-0 bottom-0 z-30 flex flex-col md:static',
-				searching && 'max-md:hidden'
-			]}
-		>
-			<div
-				class="flex flex-col items-center gap-2 px-gutter pb-4 md:absolute md:inset-x-0 md:bottom-hud md:z-10 md:pb-0"
-			>
-				{#if empty}
-					<p role="status" class="notice pointer-events-auto bg-info-soft">
-						{COPY.surpriseEmpty}
-					</p>
-				{/if}
-				<button type="button" class="btn-primary pointer-events-auto" onclick={surprise}>
-					<Icon icon="ph:magnifying-glass" class="size-5" aria-hidden="true" />{COPY.surprise}
-				</button>
+		{#if app.status === 'loading' || app.status === 'idle'}
+			<div class="pointer-events-none absolute inset-x-0 top-36 z-10 flex justify-center px-gutter">
+				<section class="panel w-64" aria-busy="true">
+					<span class="sr-only">{COPY.loading}</span>
+					<span class="skeleton h-4 w-24"></span>
+					<span class="skeleton mt-3 h-6 w-3/4"></span>
+					<span class="skeleton mt-3 h-4 w-1/2"></span>
+				</section>
 			</div>
-
-			<section
-				bind:this={sheet}
-				class="sheet relative pointer-events-auto max-h-[60dvh] overflow-y-auto md:absolute md:top-4 md:right-gutter md:bottom-auto md:z-30 md:max-h-[calc(100dvh-8rem)] md:w-panel"
-				aria-labelledby="sheet-t"
-			>
-				{#if app.selected}
-					<PlaceSheet place={app.selected} onclose={() => app.select(null)} />
-				{:else}
-					<NearbyList onpick={show} />
-				{/if}
-			</section>
-		</div>
-	{/if}
+		{:else if app.status === 'error'}
+			<div class="pointer-events-none absolute inset-x-0 top-36 z-10 flex justify-center px-gutter">
+				<section class="panel pointer-events-auto w-full max-w-sm text-center" aria-labelledby="error-t">
+					<Icon icon="ph:warning-circle" class="mx-auto size-10 text-danger" aria-hidden="true" />
+					<h2 id="error-t" class="mt-3">Aarteita ei saatu haettua</h2>
+					<p class="mt-1 text-sm text-fg-muted">{COPY.errorBody}</p>
+					<button type="button" class="btn-primary mt-4" onclick={retry}>
+						<Icon icon="ph:arrow-clockwise" class="size-5" aria-hidden="true" />{COPY.retry}
+					</button>
+				</section>
+			</div>
+		{/if}
+	</div>
 </div>
