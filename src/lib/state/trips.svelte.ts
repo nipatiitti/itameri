@@ -19,6 +19,7 @@ export class TripsState {
 	show(id: string) {
 		this.activeId = id;
 		this.fitSeq += 1;
+		app.select(null);
 	}
 	fit() {
 		if (this.activeId) this.fitSeq += 1;
