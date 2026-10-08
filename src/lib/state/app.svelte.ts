@@ -76,7 +76,9 @@ export class AppState {
 		let r = radiusM;
 		for (let i = 0; i < 6; i++) {
 			const near = this.visible.filter((p) => !ex.has(p.id) && distanceM(from, p) <= r);
-			if (near.length) return near[Math.floor(Math.random() * near.length)];
+			const rare = near.filter((p) => p.rare);
+			const pool = rare.length && Math.random() < 0.5 ? rare : near;
+			if (pool.length) return pool[Math.floor(Math.random() * pool.length)];
 			r *= 2.5;
 		}
 		return null;
