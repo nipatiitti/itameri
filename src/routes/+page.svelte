@@ -9,7 +9,7 @@
 	import PlaceSheet from '$lib/components/PlaceSheet.svelte';
 	import TripSheet from '$lib/components/TripSheet.svelte';
 	import PlaceSearch from '$lib/components/PlaceSearch.svelte';
-	import { scale } from 'svelte/transition';
+	import { fly, scale } from 'svelte/transition';
 	import { tick } from 'svelte';
 	import { COPY } from '$lib/content/copy';
 	import { app } from '$lib/state/app.svelte';
@@ -42,6 +42,25 @@
 		map.flyTo(place, 16);
 		app.select(place.id);
 	}
+
+	/** When the open place is a stop of the active trip: its number and a way to step through the loop. */
+	const stepper = $derived.by(() => {
+		const trip = trips.active;
+		const id = app.selectedId;
+		if (!trip || !id) return undefined;
+		const stops = trips.stopsOf(trip);
+		const i = stops.findIndex((p) => p.id === id);
+		if (i < 0) return undefined;
+		return { n: i + 1, total: stops.length, onstep: (dir: 1 | -1) => stops[i + dir] && show(stops[i + dir]) };
+	});
+
+	function closePlace() {
+		const wasStop = !!stepper;
+		app.select(null);
+		if (wasStop) trips.fit();
+	}
+
+	const sheetKey = $derived(app.selectedId ?? (trips.activeId ? 'trip' : 'list'));
 
 	function surprise() {
 		clearTimeout(emptyTimer);
@@ -159,17 +178,21 @@
 						></button>
 					{/if}
 					<div id="sheet-body" hidden={!wide && sheetMode === 'pill'}>
-						{#if app.selected}
-							<PlaceSheet place={app.selected} onclose={() => app.select(null)} {collapsed} />
-						{:else if trips.active}
-							<TripSheet trip={trips.active} onpick={show} onhide={() => (trips.activeId = null)} {collapsed} />
-						{:else}
-							<NearbyList
-								onpick={show}
-								{collapsed}
-								ontoggle={wide ? undefined : () => (sheetMode = sheetMode === 'full' ? 'header' : 'full')}
-							/>
-						{/if}
+						{#key sheetKey}
+							<div in:fly={{ y: 16, duration: 220 }}>
+								{#if app.selected}
+									<PlaceSheet place={app.selected} onclose={closePlace} {stepper} {collapsed} />
+								{:else if trips.active}
+									<TripSheet trip={trips.active} onpick={show} onhide={() => (trips.activeId = null)} {collapsed} />
+								{:else}
+									<NearbyList
+										onpick={show}
+										{collapsed}
+										ontoggle={wide ? undefined : () => (sheetMode = sheetMode === 'full' ? 'header' : 'full')}
+									/>
+								{/if}
+							</div>
+						{/key}
 					</div>
 				</section>
 			</div>

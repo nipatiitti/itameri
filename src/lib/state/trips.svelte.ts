@@ -9,6 +9,18 @@ export class TripsState {
 	#store = persisted<Trip[]>('arjen-aarteet.trips', []);
 	/** Trip drawn on the main map, or null. */
 	activeId = $state<string | null>(null);
+	/** Bumped when the map should fit the whole active loop; the map records what it has handled. */
+	fitSeq = $state(0);
+	fitHandled = 0;
+
+	/** Draw this trip on the map and fit the whole loop into view. */
+	show(id: string) {
+		this.activeId = id;
+		this.fitSeq += 1;
+	}
+	fit() {
+		if (this.activeId) this.fitSeq += 1;
+	}
 
 	get list(): Trip[] {
 		return this.#store.value;

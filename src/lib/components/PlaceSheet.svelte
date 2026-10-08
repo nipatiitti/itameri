@@ -10,8 +10,14 @@
   let {
     place,
     onclose,
+    stepper,
     collapsed = false,
-  }: { place: Place; onclose: () => void; collapsed?: boolean } = $props();
+  }: {
+    place: Place;
+    onclose: () => void;
+    stepper?: { n: number; total: number; onstep: (dir: 1 | -1) => void };
+    collapsed?: boolean;
+  } = $props();
 
   const SOURCE_LABEL: Record<StorySource, string> = {
     wikipedia: "Wikipedia",
@@ -93,6 +99,18 @@
     <Icon icon="ph:x" class="size-6" aria-hidden="true" />
   </button>
 </div>
+
+{#if stepper}
+  <nav aria-label="Retken kohteet" class="mt-3 flex items-center gap-2">
+    <button type="button" class="btn-quiet" disabled={stepper.n === 1} onclick={() => stepper.onstep(-1)}>
+      <Icon icon="ph:arrow-left" class="size-5" aria-hidden="true" />Edellinen
+    </button>
+    <span class="flex-1 text-center text-sm text-fg-muted">Kohde {stepper.n}/{stepper.total}</span>
+    <button type="button" class="btn-quiet" disabled={stepper.n === stepper.total} onclick={() => stepper.onstep(1)}>
+      Seuraava<Icon icon="ph:arrow-right" class="size-5" aria-hidden="true" />
+    </button>
+  </nav>
+{/if}
 
 <div id="place-body" hidden={collapsed}>
 {#if place.rare || found}

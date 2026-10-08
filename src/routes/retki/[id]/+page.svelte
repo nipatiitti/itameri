@@ -48,7 +48,7 @@
 
 	function showOnMap() {
 		if (!trip) return;
-		trips.activeId = trip.id;
+		trips.show(trip.id);
 		goto('/');
 	}
 

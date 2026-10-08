@@ -247,8 +247,17 @@
 				...stops.map((p, i) => feature(p, { kind: 'stop', id: p.id, n: i + 1 }))
 			])
 		);
+	});
+
+	// Fit the whole loop only when asked (Näytä kartalla, Aloita retki, closing a stop), never on a plain redraw.
+	$effect(() => {
+		const mm = m;
+		const seq = trips.fitSeq;
+		const trip = trips.active;
+		if (!mm || !trip || seq === trips.fitHandled) return;
+		trips.fitHandled = seq;
 		const bounds = new LngLatBounds();
-		for (const c of ring) bounds.extend(c as [number, number]);
+		for (const p of [trip.plan.start, ...trips.stopsOf(trip)]) bounds.extend([p.lon, p.lat]);
 		mm.fitBounds(bounds, { padding: 60, maxZoom: 16 });
 	});
 

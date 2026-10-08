@@ -47,3 +47,5 @@ data-worker: Museovirasto wrecks into maritime. Nav icon ph:path (outside the de
 - Route fit: planTrip trims stops (largest detour first, min 2) until minutes <= duration × 1.15.
 - Known risks: phone pill overlaps top of close button slightly; Lapland (lat > 66) not in extract; Nominatim rate limit not enforced.
 - Remaining: user browser pass of Retki + sheet → fixes → 19:20 freeze → pnpm build once (~19:30) → zip without node_modules/.svelte-kit (19:45).
+- 18:45 user decision: the design system's no-animation rule is scrapped; Svelte fly/scale transitions allowed (sheet content, wizard steps, trip cards).
+- Trip ↔ map contract: trips.show(id) = draw + fit; trips.activeId = draw only; trips.fit() refit. PlaceSheet gets `stepper` when the open place is a stop of the active trip (Edellinen/Seuraava, Kohde n/total); closing a stop refits the loop. TripSheet "Aloita retki" opens stop 1.

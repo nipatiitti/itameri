@@ -2,6 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import { formatDistance } from '$lib/data/geo';
 	import { formatMinutes } from '$lib/data/route';
+	import { fly } from 'svelte/transition';
 	import { trips } from '$lib/state/trips.svelte';
 
 	const date = new Intl.DateTimeFormat('fi-FI');
@@ -19,8 +20,8 @@
 	{#if trips.list.length}
 		<a href="/retki/uusi" class="btn-primary mt-4">Uusi retki</a>
 		<ul class="mt-6 grid gap-3" aria-label="Tallennetut retket">
-			{#each trips.list as trip (trip.id)}
-				<li>
+			{#each trips.list as trip, i (trip.id)}
+				<li in:fly={{ y: 12, duration: 200, delay: i * 40 }}>
 					<a href={`/retki/${trip.id}`} class="card flex items-center gap-3">
 						<span class="min-w-0 flex-1">
 							<span class="block font-semibold">{trip.name}</span>

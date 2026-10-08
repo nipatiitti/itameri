@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import { goto } from '$app/navigation';
+	import { fly } from 'svelte/transition';
 	import StartPicker from '$lib/components/StartPicker.svelte';
 	import type { SearchHit } from '$lib/components/PlaceSearch.svelte';
 	import { DURATIONS, MOODS, TRANSPORTS, type Duration, type LngLat, type Mood, type Transport } from '$lib/types';
@@ -64,6 +65,8 @@
 		</div>
 	</div>
 
+	{#key step}
+	<div in:fly={{ x: 24, duration: 200 }}>
 	{#if step === 1}
 		<ul class="mt-6 grid gap-3 md:grid-cols-2">
 			{#each MOODS as m (m)}
@@ -137,4 +140,6 @@
 			Suunnittele retki
 		</button>
 	{/if}
+	</div>
+	{/key}
 </div>

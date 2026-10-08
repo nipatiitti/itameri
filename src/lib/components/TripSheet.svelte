@@ -45,8 +45,11 @@
 		{/each}
 	</ol>
 
-	<div class="mt-4 flex flex-wrap gap-2">
-		<a href={`/retki/${trip.id}`} class="btn-secondary flex-1">Avaa retken sivu</a>
+	<button type="button" class="btn-primary mt-4 w-full" disabled={!stops.length} onclick={() => onpick(stops[0])}>
+		<Icon icon="ph:path" class="size-5" aria-hidden="true" />Aloita retki
+	</button>
+	<div class="mt-2 flex flex-wrap gap-2">
+		<a href={`/retki/${trip.id}`} class="btn-quiet flex-1">Avaa retken sivu</a>
 		<button type="button" class="btn-quiet" onclick={onhide}>
 			<Icon icon="ph:x" class="size-5" aria-hidden="true" />Piilota reitti
 		</button>
