@@ -59,7 +59,7 @@
 		if (restored || app.status !== 'ready') return;
 		const id = page.url.searchParams.get('p');
 		untrack(() => {
-			const place = id ? app.byId(id) : undefined;
+			const place = id && id !== app.selectedId ? app.byId(id) : undefined;
 			if (place) show(place);
 		});
 		restored = true;
