@@ -92,3 +92,32 @@ export interface SourceEntry {
 	url: string;
 	licence: string;
 }
+
+// ---------- Retki (trip planner) ----------
+
+export const MOODS = ['calm', 'urban', 'woods', 'sea', 'history'] as const;
+export type Mood = (typeof MOODS)[number];
+export const TRANSPORTS = ['walk', 'bike', 'car'] as const;
+export type Transport = (typeof TRANSPORTS)[number];
+export const DURATIONS = ['short', 'medium', 'long'] as const;
+export type Duration = (typeof DURATIONS)[number];
+
+/** The wizard's answers. */
+export interface TripPlan {
+	mood: Mood;
+	transport: Transport;
+	duration: Duration;
+	start: LngLat;
+	startName?: string; // from search, else undefined
+}
+
+/** A planned loop, persisted in localStorage. Stops are place ids in visiting order; the loop returns to start. */
+export interface Trip {
+	id: string;
+	name: string;
+	createdAt: string; // ISO
+	plan: TripPlan;
+	stops: string[];
+	lengthM: number; // whole loop including the return leg
+	minutes: number; // estimated time including stops
+}

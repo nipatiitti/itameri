@@ -32,3 +32,10 @@ Nav: Kartta (/), Löydöt (/loydot), Tietoa (/tietoa). UI language Finnish. Serv
 17:03 start · 17:25 contracts + dispatch · ~18:00 skeleton on screen · 19:20 feature freeze · 19:30 build · 19:45 zip
 - IDEA.md adopted: name Arjen aarteet, rarity flag, nearby list in the sheet, Finna old-photo strip. Retki mode only if time.
 - Gotcha: maplibre-gl.css is unlayered and forces position:relative on the map div; size it with h-full w-full, not absolute inset-0. maplibre 6.13 needs setWorkerUrl with a Vite ?worker&url import (done in PlacesMap).
+
+## Retki planner (18:15 decision)
+New tab Retki (/retki list, /retki/uusi wizard, /retki/[id] detail). Contracts: types.ts (Mood, Transport, Duration, TripPlan, Trip),
+src/lib/content/trip.ts (MOOD_META with categories, TRANSPORT_META, DURATION_META, BUDGET), src/lib/data/route.ts (planTrip, loopLength,
+formatMinutes), src/lib/state/trips.svelte.ts (trips.list/active/activeId/create/reroll/rename/remove/stopsOf). map-worker: PickerMap.svelte
+(bind:center, follows map.fly) and route line + numbered stops in PlacesMap from trips.active. ui-worker: the three pages + trip tag on map panel.
+data-worker: Museovirasto wrecks into maritime. Nav icon ph:path (outside the design list, user-approved concept).

@@ -10,10 +10,12 @@
 
 	const items = [
 		{ href: '/', label: 'Kartta', icon: 'ph:map-trifold' },
+		{ href: '/retki', label: 'Retki', icon: 'ph:path' },
 		{ href: '/loydot', label: 'Löydöt', icon: 'ph:list-bullets' },
 		{ href: '/tietoa', label: 'Tietoa', icon: 'ph:info' }
 	];
-	const current = (href: string) => (page.url.pathname === href ? 'page' : undefined);
+	const current = (href: string) =>
+		page.url.pathname === href || (href !== '/' && page.url.pathname.startsWith(href)) ? 'page' : undefined;
 </script>
 
 <svelte:head>
