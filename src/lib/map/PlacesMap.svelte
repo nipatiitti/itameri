@@ -1,55 +1,24 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { Map as MlMap, AttributionControl, setWorkerUrl, type GeoJSONSource } from 'maplibre-gl';
-	import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
-	import 'maplibre-gl/dist/maplibre-gl.css';
+	import { LngLatBounds, type Map as MlMap, type GeoJSONSource } from 'maplibre-gl';
 	import { app } from '$lib/state/app.svelte';
 	import { map } from '$lib/state/map.svelte';
-	import { MAP, ALGAE } from '$lib/map-colors';
-	import type { LngLat } from '$lib/types';
-
-	type Point = GeoJSON.Feature<GeoJSON.Point>;
-	type Collection = GeoJSON.FeatureCollection<GeoJSON.Point>;
-
-	setWorkerUrl(workerUrl);
-	const STYLE = 'https://tiles.openfreemap.org/styles/positron';
-	const EMPTY: Collection = { type: 'FeatureCollection', features: [] };
-
-	const feature = (p: LngLat, properties: Record<string, unknown> = {}): Point => ({
-		type: 'Feature',
-		geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
-		properties
-	});
-	const collection = (features: Point[]): Collection => ({ type: 'FeatureCollection', features });
+	import { trips } from '$lib/state/trips.svelte';
+	import { MAP } from '$lib/map-colors';
+	import {
+		EMPTY,
+		addHereLayer,
+		collection,
+		createMap,
+		feature,
+		followFly,
+		setData,
+		showHere,
+		syncView,
+		tintBasemap
+	} from './basemap';
 
 	let m = $state.raw<MlMap | null>(null);
-
-	function setData(id: string, data: Collection) {
-		(m?.getSource(id) as GeoJSONSource | undefined)?.setData(data);
-	}
-
-	/** Pull positron's grey basemap toward the paper palette. Every colour is a theme token. */
-	function tintBasemap(mm: MlMap) {
-		const paint = (id: string, prop: string, value: unknown) => {
-			if (mm.getLayer(id)) mm.setPaintProperty(id, prop, value);
-		};
-		paint('background', 'background-color', MAP.land);
-		paint('water', 'fill-color', MAP.water);
-		paint('waterway', 'line-color', MAP.water);
-		for (const id of ['park', 'landcover_wood']) {
-			paint(id, 'fill-color', ALGAE[0]);
-			paint(id, 'fill-opacity', id === 'park' ? 0.45 : 0.3);
-		}
-		paint('landuse_residential', 'fill-color', MAP.muted);
-		paint('landuse_residential', 'fill-opacity', 0.12);
-		paint('building', 'fill-color', MAP.muted);
-		paint('building', 'fill-opacity', 0.3);
-		for (const id of ['highway-name-minor', 'highway-name-major', 'highway-name-path', 'label_other', 'label_village', 'label_town', 'label_city', 'label_state']) {
-			paint(id, 'text-color', MAP.label);
-			paint(id, 'text-halo-color', MAP.land);
-		}
-		for (const id of ['water_name_point_label', 'water_name_line_label']) paint(id, 'text-color', MAP.select);
-	}
 
 	function addLayers(mm: MlMap) {
 		tintBasemap(mm);
@@ -63,7 +32,8 @@
 			clusterMaxZoom: 15
 		});
 		mm.addSource('selected', { type: 'geojson', data: EMPTY });
-		mm.addSource('here', { type: 'geojson', data: EMPTY });
+		mm.addSource('route', { type: 'geojson', data: EMPTY });
+		mm.addSource('route-points', { type: 'geojson', data: EMPTY });
 
 		mm.addLayer({
 			id: 'clusters',
@@ -91,6 +61,18 @@
 			paint: { 'text-color': MAP.halo }
 		});
 		mm.addLayer({
+			id: 'route',
+			type: 'line',
+			source: 'route',
+			layout: { 'line-join': 'round', 'line-cap': 'round' },
+			paint: {
+				'line-color': MAP.select,
+				'line-width': 3,
+				'line-opacity': 0.7,
+				'line-dasharray': [2, 1.5]
+			}
+		});
+		mm.addLayer({
 			id: 'points',
 			type: 'circle',
 			source: 'places',
@@ -114,6 +96,44 @@
 			}
 		});
 		mm.addLayer({
+			id: 'route-start',
+			type: 'circle',
+			source: 'route-points',
+			filter: ['==', ['get', 'kind'], 'start'],
+			paint: {
+				'circle-color': MAP.select,
+				'circle-radius': 7,
+				'circle-stroke-color': MAP.halo,
+				'circle-stroke-width': 2
+			}
+		});
+		mm.addLayer({
+			id: 'route-stops',
+			type: 'circle',
+			source: 'route-points',
+			filter: ['==', ['get', 'kind'], 'stop'],
+			paint: {
+				'circle-color': MAP.halo,
+				'circle-radius': 11,
+				'circle-stroke-color': MAP.select,
+				'circle-stroke-width': 2
+			}
+		});
+		mm.addLayer({
+			id: 'route-stop-number',
+			type: 'symbol',
+			source: 'route-points',
+			filter: ['==', ['get', 'kind'], 'stop'],
+			layout: {
+				'text-field': ['to-string', ['get', 'n']],
+				'text-font': ['Noto Sans Regular'],
+				'text-size': 12,
+				'text-allow-overlap': true,
+				'text-ignore-placement': true
+			},
+			paint: { 'text-color': MAP.select }
+		});
+		mm.addLayer({
 			id: 'points-label',
 			type: 'symbol',
 			source: 'places',
@@ -134,37 +154,14 @@
 				'text-halo-width': 1.5
 			}
 		});
-		mm.addLayer({
-			id: 'here',
-			type: 'circle',
-			source: 'here',
-			paint: {
-				'circle-color': MAP.here,
-				'circle-radius': 6,
-				'circle-stroke-color': MAP.halo,
-				'circle-stroke-width': 2
-			}
-		});
+		addHereLayer(mm);
 	}
 
-	function syncView(mm: MlMap) {
-		const c = mm.getCenter();
-		const b = mm.getBounds();
-		map.center = { lon: c.lng, lat: c.lat };
-		map.zoom = mm.getZoom();
-		map.bounds = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
-	}
+	const CLICKABLE = ['route-stops', 'selected', 'clusters', 'points'];
 
 	const attachMap = (el: HTMLDivElement) => {
-		const start = untrack(() => ({ lon: map.center.lon, lat: map.center.lat, zoom: map.zoom }));
-		const mm = new MlMap({
-			container: el,
-			style: STYLE,
-			center: [start.lon, start.lat],
-			zoom: start.zoom,
-			attributionControl: false
-		});
-		mm.addControl(new AttributionControl({ compact: true }), 'bottom-right');
+		const start = untrack(() => ({ center: map.center, zoom: map.zoom }));
+		const mm = createMap(el, start.center, start.zoom);
 
 		mm.on('load', () => {
 			addLayers(mm);
@@ -175,7 +172,7 @@
 
 		mm.on('click', (e) => {
 			if (!mm.getLayer('points')) return;
-			const [f] = mm.queryRenderedFeatures(e.point, { layers: ['selected', 'clusters', 'points'] });
+			const [f] = mm.queryRenderedFeatures(e.point, { layers: CLICKABLE });
 			if (!f) {
 				app.select(null);
 				return;
@@ -193,10 +190,9 @@
 			mm.easeTo({ center: [lon, lat] });
 		});
 
-		const pointer = () => (mm.getCanvas().style.cursor = 'pointer');
-		const plain = () => (mm.getCanvas().style.cursor = '');
-		mm.on('mouseenter', ['clusters', 'points'], pointer);
-		mm.on('mouseleave', ['clusters', 'points'], plain);
+		const hoverable = ['clusters', 'points', 'route-stops'];
+		mm.on('mouseenter', hoverable, () => (mm.getCanvas().style.cursor = 'pointer'));
+		mm.on('mouseleave', hoverable, () => (mm.getCanvas().style.cursor = ''));
 
 		return () => {
 			m = null;
@@ -207,6 +203,7 @@
 	$effect(() => {
 		if (!m) return;
 		setData(
+			m,
 			'places',
 			collection(
 				app.visible.map((p) => feature(p, { id: p.id, name: p.name, cat: p.category, rare: p.rare }))
@@ -217,26 +214,46 @@
 	$effect(() => {
 		if (!m) return;
 		const s = app.selected;
-		setData('selected', s ? collection([feature(s, { id: s.id })]) : EMPTY);
+		setData(m, 'selected', s ? collection([feature(s, { id: s.id })]) : EMPTY);
+		m.setPaintProperty('route-stops', 'circle-stroke-width', [
+			'case',
+			['==', ['get', 'id'], s?.id ?? ''],
+			3,
+			2
+		]);
 	});
 
 	$effect(() => {
-		if (!m) return;
-		const h = map.here;
-		setData('here', h ? collection([feature(h)]) : EMPTY);
-	});
-
-	$effect(() => {
-		const fly = map.fly;
 		const mm = m;
-		if (!mm || !fly || fly.seq <= map.handledSeq) return;
-		map.handledSeq = fly.seq;
-		mm.flyTo({
-			center: [fly.target.lon, fly.target.lat],
-			zoom: fly.zoom ?? Math.max(mm.getZoom(), 15),
-			essential: true
+		if (!mm) return;
+		const trip = trips.active;
+		if (!trip) {
+			setData(mm, 'route', EMPTY);
+			setData(mm, 'route-points', EMPTY);
+			return;
+		}
+		const home = trip.plan.start;
+		const stops = trips.stopsOf(trip);
+		const ring = [home, ...stops, home].map((p) => [p.lon, p.lat]);
+		setData(mm, 'route', {
+			type: 'FeatureCollection',
+			features: [{ type: 'Feature', geometry: { type: 'LineString', coordinates: ring }, properties: {} }]
 		});
+		setData(
+			mm,
+			'route-points',
+			collection([
+				feature(home, { kind: 'start' }),
+				...stops.map((p, i) => feature(p, { kind: 'stop', id: p.id, n: i + 1 }))
+			])
+		);
+		const bounds = new LngLatBounds();
+		for (const c of ring) bounds.extend(c as [number, number]);
+		mm.fitBounds(bounds, { padding: 60, maxZoom: 16 });
 	});
+
+	$effect(() => showHere(m));
+	$effect(() => followFly(m));
 </script>
 
 <div class="h-full w-full" {@attach attachMap}></div>
