@@ -34,12 +34,12 @@ interface TextPart {
 async function build(place: Place): Promise<Story> {
 	const [text, oldPhotos] = await Promise.all([textChain(place), finnaPhotos(place)]);
 	const fallback = baseStory(place);
-	const hero = text?.hero ?? (await heroChain(place, oldPhotos));
+	const hero = text?.hero ?? (await heroChain(place));
 	return {
 		title: place.name,
 		extract: text?.extract ?? fallback.extract,
 		hero,
-		oldPhotos: hero === oldPhotos[0] ? oldPhotos.slice(1) : oldPhotos,
+		oldPhotos,
 		readMoreUrl: text?.readMoreUrl ?? fallback.readMoreUrl,
 		readMoreLabel: text?.readMoreUrl ? text.readMoreLabel : fallback.readMoreLabel,
 		source: text?.extract ? text.source : fallback.source
@@ -153,13 +153,13 @@ function nameWords(s: string): Set<string> {
 
 // ---------- hero image ----------
 
-async function heroChain(place: Place, oldPhotos: Photo[]): Promise<Photo | undefined> {
+async function heroChain(place: Place): Promise<Photo | undefined> {
 	if (place.image) {
 		const commons = /Special:FilePath\/([^?]+)/.exec(place.image);
 		if (commons) return (await commonsPhoto(decodeURIComponent(commons[1]))) ?? { url: place.image, credit: 'Kuva: Wikimedia Commons' };
 		return { url: place.image, credit: 'Kuva: OpenStreetMap-yhteisö' };
 	}
-	return (await commonsNearby(place)) ?? oldPhotos[0];
+	return commonsNearby(place);
 }
 
 interface ImageInfo {
@@ -231,6 +231,29 @@ interface FinnaRecord {
 	buildings?: { translated?: string }[];
 	year?: string;
 	recordPage?: string;
+	geoLocations?: string[];
+}
+
+/** True when the record's own geometry is a point or a small area within about 3 km of the place. */
+function finnaNear(r: FinnaRecord, place: Place): boolean {
+	const wkt = r.geoLocations?.[0];
+	if (!wkt) return false;
+	const nums = wkt.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+	if (nums.length < 2) return false;
+	let lons: number[], lats: number[];
+	if (/^ENVELOPE/i.test(wkt)) {
+		lons = [nums[0], nums[1]];
+		lats = [nums[2], nums[3]];
+	} else {
+		lons = nums.filter((_, i) => i % 2 === 0);
+		lats = nums.filter((_, i) => i % 2 === 1);
+	}
+	const minLon = Math.min(...lons), maxLon = Math.max(...lons);
+	const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+	const small = maxLon - minLon < 0.08 && maxLat - minLat < 0.04;
+	const pad = 0.03;
+	const inside = place.lon > minLon - pad && place.lon < maxLon + pad && place.lat > minLat - pad && place.lat < maxLat + pad;
+	return small && inside;
 }
 
 function finnaUrl(lookfor: string, lat: number, lon: number, d: number): string {
@@ -240,7 +263,7 @@ function finnaUrl(lookfor: string, lat: number, lon: number, d: number): string 
 		['filter[]', '~usage_rights_str_mv:usage_A'],
 		['filter[]', '~usage_rights_str_mv:usage_B'],
 		['filter[]', `{!geofilt sfield=location_geo pt=${lat},${lon} d=${d}}`],
-		...['id', 'title', 'images', 'imageRights', 'buildings', 'year', 'recordPage'].map(
+		...['id', 'title', 'images', 'imageRights', 'buildings', 'year', 'recordPage', 'geoLocations'].map(
 			(f): [string, string] => ['field[]', f]
 		),
 		['limit', '6'],
@@ -249,12 +272,12 @@ function finnaUrl(lookfor: string, lat: number, lon: number, d: number): string 
 	return `https://api.finna.fi/v1/search?${params.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&')}`;
 }
 
-async function finnaSearch(url: string): Promise<Photo[]> {
+async function finnaSearch(url: string, place: Place): Promise<Photo[]> {
 	const data = await getJson<{ records?: FinnaRecord[] }>(url);
 	const photos: Photo[] = [];
 	for (const r of data?.records ?? []) {
 		const img = r.images?.[0];
-		if (!img) continue;
+		if (!img || !finnaNear(r, place)) continue;
 		const sized = /[?&]size=/.test(img) ? img.replace(/([?&]size=)[a-z]+/, '$1medium') : `${img}&size=medium`;
 		const by = [r.buildings?.[0]?.translated, r.imageRights?.copyright].filter(Boolean).join(', ');
 		photos.push({
@@ -273,10 +296,10 @@ async function finnaSearch(url: string): Promise<Photo[]> {
 }
 
 async function finnaPhotos(place: Place): Promise<Photo[]> {
-	const near = await finnaSearch(finnaUrl('*', place.lat, place.lon, 0.5));
+	const near = await finnaSearch(finnaUrl('*', place.lat, place.lon, 0.5), place);
 	if (near.length > 0) return near;
 	if ((place.name.match(/\p{L}/gu) ?? []).length < 4) return [];
-	return finnaSearch(finnaUrl(`"${place.name.replace(/"/g, '')}"`, place.lat, place.lon, 3));
+	return finnaSearch(finnaUrl(`"${place.name.replace(/"/g, '')}"`, place.lat, place.lon, 3), place);
 }
 
 // ---------- tag-based fallback ----------
