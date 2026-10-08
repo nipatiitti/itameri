@@ -1,8 +1,9 @@
 import type { Place, Trip, TripPlan } from '$lib/types';
 import { persisted } from './persisted.svelte';
 import { planTrip } from '$lib/data/route';
-import { MOOD_META, STOP_MINUTES } from '$lib/content/trip';
-import { fetchShape } from '$lib/data/routing';
+import { MOOD_META, STOP_MINUTES, TRANSPORT_META } from '$lib/content/trip';
+import { fetchLegs } from '$lib/data/routing';
+import { distanceM } from '$lib/data/geo';
 import { app } from './app.svelte';
 
 /** Saved trips (localStorage) and the one currently drawn on the map. */
@@ -35,11 +36,31 @@ export class TripsState {
 		if (this.#pending.get(id) === key) return;
 		this.#pending.set(id, key);
 		const stops = this.stopsOf(trip);
-		const shape = await fetchShape([trip.plan.start, ...stops, trip.plan.start], trip.plan.transport);
-		if (!shape || this.#pending.get(id) !== key) return;
-		this.shapes = { ...this.shapes, [id]: shape.coords };
-		const minutes = Math.round(shape.seconds / 60 + stops.length * STOP_MINUTES);
-		this.#store.value = this.#store.value.map((t) => (t.id === id ? { ...t, lengthM: shape.lengthM, minutes } : t));
+		const points = [trip.plan.start, ...stops, trip.plan.start];
+		const legs = await fetchLegs(points, trip.plan.transport);
+		if (this.#pending.get(id) !== key || !legs.some(Boolean)) return;
+		// A leg that detours far beyond the straight line (ferry to the mainland and back) becomes a straight hop over the water.
+		const mps = (TRANSPORT_META[trip.plan.transport].kmh * 1000) / 3600;
+		const coords: [number, number][] = [];
+		let lengthM = 0;
+		let seconds = 0;
+		legs.forEach((leg, i) => {
+			const a = points[i];
+			const b = points[i + 1];
+			const straight = distanceM(a, b);
+			if (leg && leg.coords.length > 1 && leg.lengthM <= Math.max(straight * 3, straight + 1500)) {
+				coords.push(...leg.coords);
+				lengthM += leg.lengthM;
+				seconds += leg.seconds;
+			} else {
+				coords.push([a.lon, a.lat], [b.lon, b.lat]);
+				lengthM += straight;
+				seconds += straight / mps;
+			}
+		});
+		this.shapes = { ...this.shapes, [id]: coords };
+		const minutes = Math.round(seconds / 60 + stops.length * STOP_MINUTES);
+		this.#store.value = this.#store.value.map((t) => (t.id === id ? { ...t, lengthM: Math.round(lengthM), minutes } : t));
 	}
 
 	get list(): Trip[] {

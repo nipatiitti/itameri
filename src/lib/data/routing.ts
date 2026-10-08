@@ -1,7 +1,7 @@
 import type { LngLat, Transport } from '$lib/types';
 
-/** A road-following route from Valhalla (FOSSGIS public server). */
-export interface RouteShape {
+/** One leg of a road-following route from Valhalla (FOSSGIS public server). */
+export interface RouteLeg {
 	coords: [number, number][]; // [lon, lat]
 	lengthM: number;
 	seconds: number;
@@ -9,8 +9,22 @@ export interface RouteShape {
 
 const COSTING: Record<Transport, string> = { walk: 'pedestrian', bike: 'bicycle', car: 'auto' };
 
-/** Route through the points in order. Resolves to null on any failure; the caller keeps its straight line. */
-export async function fetchShape(points: LngLat[], transport: Transport): Promise<RouteShape | null> {
+/**
+ * One leg per consecutive pair of points. A null leg means Valhalla could not route it (an islet, a
+ * point far from any road) and the caller draws a straight hop instead.
+ */
+export async function fetchLegs(points: LngLat[], transport: Transport): Promise<(RouteLeg | null)[]> {
+	const whole = await request(points, transport);
+	if (whole && whole.length === points.length - 1) return whole;
+	return Promise.all(
+		points.slice(1).map(async (p, i) => {
+			const leg = await request([points[i], p], transport);
+			return leg?.[0] ?? null;
+		})
+	);
+}
+
+async function request(points: LngLat[], transport: Transport): Promise<RouteLeg[] | null> {
 	if (points.length < 2) return null;
 	const ctrl = new AbortController();
 	const timer = setTimeout(() => ctrl.abort(), 12000);
@@ -27,16 +41,15 @@ export async function fetchShape(points: LngLat[], transport: Transport): Promis
 		});
 		if (!res.ok) return null;
 		const data = (await res.json()) as {
-			trip?: { legs?: { shape: string }[]; summary?: { length: number; time: number } };
+			trip?: { legs?: { shape: string; summary?: { length: number; time: number } }[] };
 		};
 		const legs = data.trip?.legs ?? [];
-		const coords = legs.flatMap((leg) => decode(leg.shape));
-		if (coords.length < 2) return null;
-		return {
-			coords,
-			lengthM: Math.round((data.trip?.summary?.length ?? 0) * 1000),
-			seconds: Math.round(data.trip?.summary?.time ?? 0)
-		};
+		if (!legs.length) return null;
+		return legs.map((leg) => ({
+			coords: decode(leg.shape),
+			lengthM: Math.round((leg.summary?.length ?? 0) * 1000),
+			seconds: Math.round(leg.summary?.time ?? 0)
+		}));
 	} catch {
 		return null;
 	} finally {
