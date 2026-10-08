@@ -7,6 +7,7 @@
 	import CategoryChips from '$lib/components/CategoryChips.svelte';
 	import NearbyList from '$lib/components/NearbyList.svelte';
 	import PlaceSheet from '$lib/components/PlaceSheet.svelte';
+	import TripSheet from '$lib/components/TripSheet.svelte';
 	import PlaceSearch from '$lib/components/PlaceSearch.svelte';
 	import { scale } from 'svelte/transition';
 	import { tick } from 'svelte';
@@ -25,6 +26,11 @@
 	const wideQuery = window.matchMedia('(min-width: 48rem)');
 	let wide = $state(wideQuery.matches);
 	let searching = $state(false);
+	/** Phone sheet: everything, only the heading, or only the pill. Wide screens always show everything. */
+	let sheetMode = $state<'full' | 'header' | 'pill'>(trips.active ? 'full' : 'header');
+	const collapsed = $derived(!wide && sheetMode === 'header');
+	const NEXT_MODE = { full: 'header', header: 'pill', pill: 'full' } as const;
+	const MODE_LABEL = { full: 'Pienennä', header: 'Piilota', pill: 'Näytä' } as const;
 	let searchButton = $state<HTMLButtonElement>();
 
 	function closeSearch() {
@@ -83,8 +89,14 @@
 		return () => wideQuery.removeEventListener('change', update);
 	});
 
+	// A new selection (list, map click, surprise) opens the sheet fully.
+	$effect(() => {
+		if (app.selectedId) sheetMode = 'full';
+	});
+
 	$effect(() => {
 		void app.selectedId;
+		void trips.activeId;
 		if (sheet) sheet.scrollTop = 0;
 		if (aside) aside.scrollTop = 0;
 	});
@@ -113,45 +125,52 @@
 					searching && 'max-md:hidden'
 				]}
 			>
-				{#if trips.active}
-					<div class="notice pointer-events-auto mx-gutter mb-2 items-center bg-info-soft md:order-first md:mx-0 md:mb-0">
-						<p class="min-w-0 flex-1">
-							<a href={`/retki/${trips.active.id}`} class="block font-semibold">{trips.active.name}</a>
-							<span class="block text-sm">{trips.active.stops.length} kohdetta</span>
-						</p>
-						<button
-							type="button"
-							class="icon-btn-quiet -my-2 -mr-2"
-							aria-label="Piilota reitti"
-							onclick={() => (trips.activeId = null)}
-						>
-							<Icon icon="ph:x" class="size-6" aria-hidden="true" />
+				{#if !app.selected && !trips.active}
+					<div class="flex flex-col items-center gap-2 px-gutter pb-4 md:items-stretch md:px-0 md:pb-0">
+						{#if empty}
+							<p role="status" class="notice pointer-events-auto bg-info-soft">
+								{COPY.surpriseEmpty}
+							</p>
+						{/if}
+						<button type="button" class="btn-primary pointer-events-auto md:w-full" onclick={surprise}>
+							<Icon icon="ph:magnifying-glass" class="size-5" aria-hidden="true" />{COPY.surprise}
 						</button>
 					</div>
 				{/if}
-				<div class="flex flex-col items-center gap-2 px-gutter pb-4 md:items-stretch md:px-0 md:pb-0">
-					{#if empty}
-						<p role="status" class="notice pointer-events-auto bg-info-soft">
-							{COPY.surpriseEmpty}
-						</p>
-					{/if}
-					<button type="button" class="btn-primary pointer-events-auto md:w-full" onclick={surprise}>
-						<Icon icon="ph:magnifying-glass" class="size-5" aria-hidden="true" />{COPY.surprise}
-					</button>
-				</div>
 
 				<section
 					bind:this={sheet}
 					class={wide
 						? '-mx-gutter border-t px-gutter pt-5'
-						: 'sheet pointer-events-auto relative max-h-[60dvh] overflow-y-auto'}
+						: [
+								'sheet pointer-events-auto relative',
+								sheetMode === 'pill' ? 'h-8 overflow-hidden' : 'max-h-[60dvh] overflow-y-auto'
+							]}
 					aria-labelledby="sheet-t"
 				>
-					{#if app.selected}
-						<PlaceSheet place={app.selected} onclose={() => app.select(null)} />
-					{:else}
-						<NearbyList onpick={show} />
+					{#if !wide}
+						<button
+							type="button"
+							class="absolute inset-x-0 top-0 h-8 md:hidden"
+							aria-label={MODE_LABEL[sheetMode]}
+							aria-expanded={sheetMode === 'full'}
+							aria-controls="sheet-body"
+							onclick={() => (sheetMode = NEXT_MODE[sheetMode])}
+						></button>
 					{/if}
+					<div id="sheet-body" hidden={!wide && sheetMode === 'pill'}>
+						{#if app.selected}
+							<PlaceSheet place={app.selected} onclose={() => app.select(null)} {collapsed} />
+						{:else if trips.active}
+							<TripSheet trip={trips.active} onpick={show} onhide={() => (trips.activeId = null)} {collapsed} />
+						{:else}
+							<NearbyList
+								onpick={show}
+								{collapsed}
+								ontoggle={wide ? undefined : () => (sheetMode = sheetMode === 'full' ? 'header' : 'full')}
+							/>
+						{/if}
+					</div>
 				</section>
 			</div>
 		{/if}

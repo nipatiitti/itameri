@@ -7,13 +7,11 @@
   import Icon from "@iconify/svelte";
   import PhotoFigure from "./PhotoFigure.svelte";
 
-  let { place, onclose }: { place: Place; onclose: () => void } = $props();
-
-  let expanded = $state(true);
-  $effect(() => {
-    void place.id;
-    expanded = true;
-  });
+  let {
+    place,
+    onclose,
+    collapsed = false,
+  }: { place: Place; onclose: () => void; collapsed?: boolean } = $props();
 
   const SOURCE_LABEL: Record<StorySource, string> = {
     wikipedia: "Wikipedia",
@@ -81,14 +79,6 @@
   });
 </script>
 
-<button
-  type="button"
-  class="absolute inset-x-0 top-0 h-8 md:hidden"
-  aria-label={expanded ? "Pienennä kortti" : "Näytä kortti"}
-  aria-expanded={expanded}
-  aria-controls="place-body"
-  onclick={() => (expanded = !expanded)}
-></button>
 <div class="flex items-start gap-3">
   <div class="min-w-0 flex-1">
     <p class="eyebrow">{meta.single}</p>
@@ -104,7 +94,7 @@
   </button>
 </div>
 
-<div id="place-body" hidden={!expanded}>
+<div id="place-body" hidden={collapsed}>
 {#if place.rare || found}
   <ul class="mt-3 flex flex-wrap gap-2" aria-label="Merkinnät">
     {#if place.rare}<li class="tag bg-highlight-soft">{COPY.rare}</li>{/if}

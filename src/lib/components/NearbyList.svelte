@@ -7,9 +7,11 @@
 	import { CATEGORY_META } from '$lib/content/categories';
 	import { COPY } from '$lib/content/copy';
 
-	let { onpick }: { onpick: (place: Place) => void } = $props();
-
-	let open = $state(window.matchMedia('(min-width: 48rem)').matches);
+	let {
+		onpick,
+		collapsed = false,
+		ontoggle
+	}: { onpick: (place: Place) => void; collapsed?: boolean; ontoggle?: () => void } = $props();
 
 	const nearby = $derived.by(() => {
 		const origin = map.origin;
@@ -20,34 +22,30 @@
 	});
 </script>
 
-<button
-	type="button"
-	class="absolute inset-x-0 top-0 h-8 md:hidden"
-	aria-label={open ? 'Piilota lista' : 'Näytä lista'}
-	aria-expanded={open}
-	aria-controls="nearby-list"
-	onclick={() => (open = !open)}
-></button>
 <p class="eyebrow">{map.here ? 'Sijainnistasi' : 'Kartan keskeltä'}</p>
 <h2 id="sheet-t" class="mt-1">
-	<button
-		type="button"
-		class="flex min-h-tap w-full items-center gap-3 text-left"
-		aria-expanded={open}
-		aria-controls="nearby-list"
-		onclick={() => (open = !open)}
-	>
-		<span class="flex-1">Aarteet lähellä</span>
-		<span class="font-sans"><span class="tag bg-sunken">{nearby.length}</span></span>
-		<Icon
-			icon="ph:caret-right"
-			class={`size-5 text-fg-muted ${open ? 'rotate-90' : '-rotate-90'}`}
-			aria-hidden="true"
-		/>
-	</button>
+	{#if ontoggle}
+		<button
+			type="button"
+			class="flex min-h-tap w-full items-center gap-3 text-left"
+			aria-expanded={!collapsed}
+			aria-controls="nearby-list"
+			onclick={ontoggle}
+		>
+			<span class="flex-1">Aarteet lähellä</span>
+			<span class="font-sans"><span class="tag bg-sunken">{nearby.length}</span></span>
+			<Icon
+				icon="ph:caret-right"
+				class={`size-5 text-fg-muted ${collapsed ? '-rotate-90' : 'rotate-90'}`}
+				aria-hidden="true"
+			/>
+		</button>
+	{:else}
+		Aarteet lähellä
+	{/if}
 </h2>
 
-<div id="nearby-list" hidden={!open}>
+<div id="nearby-list" hidden={collapsed}>
 	{#if nearby.length}
 		<ul class="-mx-gutter mt-2">
 			{#each nearby as { place, distance } (place.id)}
