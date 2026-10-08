@@ -37,6 +37,7 @@ export class TripsState {
 		this.#pending.set(id, key);
 		const stops = this.stopsOf(trip);
 		const points = [trip.plan.start, ...stops, trip.plan.start];
+		if (trip.plan.transport === 'boat') return;
 		const legs = await fetchLegs(points, trip.plan.transport);
 		if (this.#pending.get(id) !== key || !legs.some(Boolean)) return;
 		// A leg that detours far beyond the straight line (ferry to the mainland and back) becomes a straight hop over the water.

@@ -30,7 +30,7 @@
 	<p class="mt-2">
 		Retki-välilehdellä suunnittelet kierroksen neljällä napautuksella: tunnelma, kulkutapa, kesto ja
 		lähtöpiste. Sovellus valitsee parhaat aarteet lähistöltä, suosii harvinaisia ja tarinallisia
-		paikkoja ja järjestää ne lenkiksi. Reitti haetaan avoimesta Valhalla-reittipalvelusta, ja ilman sitä se piirtyy suorana viivana. Ei navigointikäyttöön. Retket
+		paikkoja ja järjestää ne lenkiksi. Kävellen, pyörällä ja autolla reitti haetaan avoimesta Valhalla-reittipalvelusta; veneellä ja veden yli se piirtyy suorana viivana. Ei navigointikäyttöön. Retket
 		tallentuvat selaimeesi.
 	</p>
 

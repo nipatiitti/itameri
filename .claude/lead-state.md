@@ -50,3 +50,4 @@ data-worker: Museovirasto wrecks into maritime. Nav icon ph:path (outside the de
 - 18:45 user decision: the design system's no-animation rule is scrapped; Svelte fly/scale transitions allowed (sheet content, wizard steps, trip cards).
 - Trip ↔ map contract: trips.show(id) = draw + fit; trips.activeId = draw only; trips.fit() refit. PlaceSheet gets `stepper` when the open place is a stop of the active trip (Edellinen/Seuraava, Kohde n/total); closing a stop refits the loop. TripSheet "Aloita retki" opens stop 1.
 - 19:00 Routing: Valhalla FOSSGIS (src/lib/data/routing.ts), trips.refine(id) fills trips.shapes and overwrites lengthM/minutes with real values; map draws shape when present, straight ring otherwise. Moods have weights; lead category gets ≥ half the stops; wrecks never routed to.
+- 19:12 Transport 'boat' (Veneellä, 10 km/h, straight lines, wrecks allowed). Per-leg detour check: leg > max(3×straight, straight+1.5 km) → straight hop.

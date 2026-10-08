@@ -97,7 +97,7 @@ export interface SourceEntry {
 
 export const MOODS = ['calm', 'urban', 'woods', 'sea', 'history'] as const;
 export type Mood = (typeof MOODS)[number];
-export const TRANSPORTS = ['walk', 'bike', 'car'] as const;
+export const TRANSPORTS = ['walk', 'bike', 'car', 'boat'] as const;
 export type Transport = (typeof TRANSPORTS)[number];
 export const DURATIONS = ['short', 'medium', 'long'] as const;
 export type Duration = (typeof DURATIONS)[number];

@@ -94,11 +94,13 @@ whether a story or photo is available, and distance from the start, with a cap p
 the trip stays varied and no two stops closer than about 80 m. The stops are ordered with a
 nearest-neighbour pass and then improved with 2-opt to shorten the loop. The trip page shows the
 stops, the length of the loop, and an estimated time. The first estimate is a straight-line sketch
-at a typical speed for the transport (walking 4.5 km/h, cycling 15 km/h, driving 40 km/h) plus
+at a typical speed for the transport (walking 4.5 km/h, cycling 15 km/h, driving 40 km/h, boating 10 km/h) plus
 10 minutes per stop. The app then asks the public Valhalla routing server run by FOSSGIS
 (valhalla1.openstreetmap.de, no key) for a real route on paths and roads with the matching
 profile, draws it on the map, and replaces the length and time with Valhalla's figures. If the
-server is slow or unreachable, the straight-line loop stays.
+server is slow or unreachable, the straight-line loop stays. Legs that Valhalla can only route via a
+long detour (a ferry to the mainland between two islets) are drawn as straight hops over the water.
+By boat the loop is always straight lines, and shipwrecks can be stops.
 
 Trips are saved in your browser. You can re-plan a trip with the same answers, rename it, delete
 it, or show it on the main map, where it is drawn as a dashed loop with numbered stops.

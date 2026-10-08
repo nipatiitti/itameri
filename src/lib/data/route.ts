@@ -17,8 +17,9 @@ export function planTrip(plan: TripPlan, places: Place[]): PlannedRoute {
 	const budget = BUDGET[plan.transport][plan.duration];
 	const start = plan.start;
 
-	// Wrecks lie under water; they are shown on the map but never routed to.
-	const visitable = (p: Place) => !/hylky|hylyt/.test(p.tags.tyyppi ?? '') && p.tags.historic !== 'wreck';
+	// Wrecks lie under water: a boat can anchor above them, nobody else gets routed there.
+	const visitable = (p: Place) =>
+		plan.transport === 'boat' || (!/hylky|hylyt/.test(p.tags.tyyppi ?? '') && p.tags.historic !== 'wreck');
 
 	let radius = budget.radiusM;
 	let pool: Place[] = [];

@@ -39,7 +39,8 @@ export const MOOD_META: Record<Mood, { label: string; blurb: string; categories:
 export const TRANSPORT_META: Record<Transport, { label: string; kmh: number }> = {
 	walk: { label: 'Kävellen', kmh: 4.5 },
 	bike: { label: 'Pyörällä', kmh: 15 },
-	car: { label: 'Autolla', kmh: 40 }
+	car: { label: 'Autolla', kmh: 40 },
+	boat: { label: 'Veneellä', kmh: 10 }
 };
 
 export const DURATION_META: Record<Duration, { label: string; minutes: number }> = {
@@ -52,7 +53,8 @@ export const DURATION_META: Record<Duration, { label: string; minutes: number }>
 export const BUDGET: Record<Transport, Record<Duration, { radiusM: number; stops: number }>> = {
 	walk: { short: { radiusM: 1200, stops: 4 }, medium: { radiusM: 2500, stops: 6 }, long: { radiusM: 4000, stops: 8 } },
 	bike: { short: { radiusM: 4000, stops: 5 }, medium: { radiusM: 7000, stops: 7 }, long: { radiusM: 12000, stops: 9 } },
-	car: { short: { radiusM: 12000, stops: 5 }, medium: { radiusM: 25000, stops: 7 }, long: { radiusM: 45000, stops: 9 } }
+	car: { short: { radiusM: 12000, stops: 5 }, medium: { radiusM: 25000, stops: 7 }, long: { radiusM: 45000, stops: 9 } },
+	boat: { short: { radiusM: 5000, stops: 4 }, medium: { radiusM: 10000, stops: 6 }, long: { radiusM: 20000, stops: 8 } }
 };
 
 /** Minutes spent at each stop. */

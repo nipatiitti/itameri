@@ -7,13 +7,14 @@ export interface RouteLeg {
 	seconds: number;
 }
 
-const COSTING: Record<Transport, string> = { walk: 'pedestrian', bike: 'bicycle', car: 'auto' };
+const COSTING: Partial<Record<Transport, string>> = { walk: 'pedestrian', bike: 'bicycle', car: 'auto' };
 
 /**
  * One leg per consecutive pair of points. A null leg means Valhalla could not route it (an islet, a
  * point far from any road) and the caller draws a straight hop instead.
  */
 export async function fetchLegs(points: LngLat[], transport: Transport): Promise<(RouteLeg | null)[]> {
+	if (!COSTING[transport]) return points.slice(1).map(() => null); // boats go straight over the water
 	const whole = await request(points, transport);
 	if (whole && whole.length === points.length - 1) return whole;
 	return Promise.all(

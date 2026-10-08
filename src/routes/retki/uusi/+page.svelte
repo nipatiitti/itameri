@@ -87,7 +87,7 @@
 			{/each}
 		</ul>
 	{:else if step === 2}
-		<ul class="mt-6 grid gap-3 md:grid-cols-3">
+		<ul class="mt-6 grid gap-3 md:grid-cols-2">
 			{#each TRANSPORTS as t (t)}
 				<li>
 					<button
