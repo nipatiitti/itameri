@@ -205,9 +205,11 @@
 		setData(
 			m,
 			'places',
-			collection(
-				app.visible.map((p) => feature(p, { id: p.id, name: p.name, cat: p.category, rare: p.rare }))
-			)
+			trips.active
+				? EMPTY
+				: collection(
+						app.visible.map((p) => feature(p, { id: p.id, name: p.name, cat: p.category, rare: p.rare }))
+					)
 		);
 	});
 

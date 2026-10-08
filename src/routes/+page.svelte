@@ -164,12 +164,32 @@
 		aria-label="Aarteet"
 		class="contents md:relative md:z-10 md:flex md:w-panel md:flex-none md:flex-col md:gap-5 md:overflow-y-auto md:border-r md:bg-surface md:px-gutter md:py-5 lg:w-[28rem]"
 	>
-		<section aria-labelledby="filter-t" class="absolute inset-x-0 top-3 z-10 md:static">
-			<h2 id="filter-t" class="sr-only font-sans text-base font-semibold md:not-sr-only">Mitä etsit?</h2>
-			<div class="md:mt-3">
-				<CategoryChips />
-			</div>
-		</section>
+		{#if trips.active}
+			<section aria-labelledby="trip-t" class="absolute inset-x-0 top-3 z-10 px-gutter md:static md:px-0">
+				<div class="notice items-center bg-info-soft" in:fly={{ y: -12, duration: 200 }}>
+					<Icon icon="ph:path" class="size-6 flex-none text-accent" aria-hidden="true" />
+					<div class="min-w-0 flex-1">
+						<p class="eyebrow">Retki käynnissä</p>
+						<h2 id="trip-t" class="truncate font-sans text-base font-semibold">{trips.active.name}</h2>
+					</div>
+					<button
+						type="button"
+						class="icon-btn-quiet -my-2 -mr-2 flex-none"
+						aria-label="Lopeta retki"
+						onclick={() => (trips.activeId = null)}
+					>
+						<Icon icon="ph:x" class="size-6" aria-hidden="true" />
+					</button>
+				</div>
+			</section>
+		{:else}
+			<section aria-labelledby="filter-t" class="absolute inset-x-0 top-3 z-10 md:static">
+				<h2 id="filter-t" class="sr-only font-sans text-base font-semibold md:not-sr-only">Mitä etsit?</h2>
+				<div class="md:mt-3">
+					<CategoryChips />
+				</div>
+			</section>
+		{/if}
 
 		{#if app.status === 'ready'}
 			<div
