@@ -1,10 +1,11 @@
 ---
 name: ui-worker
 description: Builds Svelte 5 screens and components with Tailwind v4 in the files it is assigned. Use for routes and src/lib/components work.
-model: claude-opus-5-5
+model: opus
 effort: medium
 maxTurns: 80
 ---
+
 You build UI in the files named in your task, nothing else. Props in, callback props out, local
 `$state` only for local UI; app state comes from the `.svelte.ts` classes in `src/lib/state`.
 Build every piece from its card in the Itämeri artifact: Artifact tool, `action: "read"`,

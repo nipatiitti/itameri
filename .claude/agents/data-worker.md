@@ -1,7 +1,7 @@
 ---
 name: data-worker
 description: Data loading, parsing, transforms, derived state and geo math in src/lib/data and static/data. Use for anything that turns raw data into the typed shapes in src/lib/types.ts.
-model: claude-opus-5-5
+model: opus
 effort: high
 maxTurns: 80
 ---

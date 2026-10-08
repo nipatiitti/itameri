@@ -1,10 +1,11 @@
 ---
 name: content-worker
 description: Writes UI copy, quiz questions, species and sea-area facts, the sources list and the README. Use for text content and documentation.
-model: claude-opus-5-5
+model: opus
 effort: medium
 maxTurns: 60
 ---
+
 You own `src/lib/content/**` and `README.md`. Facts come from DOMAIN.md; mark uncertain numbers
 with "noin" and name the source organisation. Attribution strings from APIS.md Part D go to
 `src/lib/content/sources.ts`. Voice and labels per the design system's brand book: Artifact tool, `action: "read"`,
