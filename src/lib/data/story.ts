@@ -190,22 +190,31 @@ async function commonsPhoto(file: string): Promise<Photo | undefined> {
 }
 
 async function commonsNearby(place: Place): Promise<Photo | undefined> {
+	const words = nameWords(place.name);
+	if (words.size === 0) return undefined;
 	const data = await getJson<{
 		query?: { pages?: Record<string, { index?: number; title: string; imageinfo?: ImageInfo[] }> };
 	}>(
-		`https://commons.wikimedia.org/w/api.php?action=query&generator=geosearch&ggscoord=${place.lat}|${place.lon}&ggsradius=150&ggsnamespace=6&ggslimit=3&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*`
+		`https://commons.wikimedia.org/w/api.php?action=query&generator=geosearch&ggscoord=${place.lat}|${place.lon}&ggsradius=100&ggsnamespace=6&ggslimit=10&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*`
 	);
 	const pages = Object.values(data?.query?.pages ?? {})
 		.filter((p) => /\.(jpe?g|png|webp)$/i.test(p.title) && p.imageinfo?.[0]?.thumburl)
 		.sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
-	const words = nameWords(place.name);
-	const p = pages.find((x) => [...nameWords(x.title)].some((w) => words.has(w))) ?? pages[0];
-	if (!p) return undefined;
-	const info = p.imageinfo![0];
+	// Only a photo whose title, description, object name or categories mention the place by name.
+	const score = (p: (typeof pages)[number]) => {
+		const m = p.imageinfo?.[0]?.extmetadata ?? {};
+		const text = [p.title, m.ImageDescription?.value, m.ObjectName?.value, m.Categories?.value]
+			.map((v) => stripHtml(v ?? ''))
+			.join(' ');
+		return [...nameWords(text)].filter((w) => words.has(w)).length;
+	};
+	const best = pages.map((p) => ({ p, n: score(p) })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n)[0]?.p;
+	if (!best) return undefined;
+	const info = best.imageinfo![0];
 	return {
 		url: info.thumburl!,
 		credit: commonsCredit(info),
-		linkUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(p.title.replace(/ /g, '_'))}`
+		linkUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(best.title.replace(/ /g, '_'))}`
 	};
 }
 
